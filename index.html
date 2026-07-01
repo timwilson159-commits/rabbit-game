@@ -1481,13 +1481,13 @@ function showOutcome(choice,fx){
 // ═══════════════════════════════════════════════════════
 //  EVOLUTION RUNNER MINI-GAME
 // ═══════════════════════════════════════════════════════
-let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:3,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
+let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:4.5,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
 const RC_W=580,RC_H=150,R_GNDH=110,R_X=70,R_W=18,R_H=14,JUMP_V=11,GRAV=.6,MAX_RUN_MS=120000;
 
 function openRunner(){
   document.getElementById('runner-gameover').style.display='none';
   document.getElementById('runner-go').style.display='none';
-  RR={active:true,y:0,vy:0,obs:[],dist:0,speed:3,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
+  RR={active:true,y:0,vy:0,obs:[],dist:0,speed:4.5,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
   document.getElementById('runner-overlay').classList.add('open');
   window.addEventListener('keydown',runnerKey);
   const cvs=document.getElementById('runner-canvas');
@@ -1507,13 +1507,13 @@ function runnerLoop(ts){
   RR.vy-=GRAV;RR.y=Math.max(0,RR.y+RR.vy);
   if(RR.y===0)RR.vy=0;
   // Speed ramp
-  RR.speed=3+Math.min(10,elapsed/12000);
+  RR.speed=4.5+Math.min(10,elapsed/12000);
   // Spawn
   RR.spawnT--;
   if(RR.spawnT<=0){
     const h=18+Math.random()*22;
     RR.obs.push({x:RC_W,w:10,h});
-    const gap=Math.max(35,80-elapsed/3000);
+    const gap=Math.max(20,75-elapsed/2000);
     RR.spawnT=Math.floor(gap+Math.random()*40);
   }
   // Move obs
@@ -1649,13 +1649,13 @@ function openTiming(island){
   GS.timingResult=null;
   const barW=500;
   // Tasmania wider zone, islands much narrower
-  const zoneW={T:75,L:35,F:30}[island]||40;
+  const zoneW={T:56,L:26,F:23}[island]||30;
   timingZoneW=zoneW;
   timingZoneL=Math.floor(barW/2-zoneW/2);
   const zone=document.getElementById('timing-zone');
   zone.style.left=timingZoneL+'px';
   zone.style.width=zoneW+'px';
-  timingSpeed={T:3.5,L:5,F:6}[island]||4;
+  timingSpeed={T:4.2,L:6,F:7.2}[island]||4.8;
   timingPos=0;timingDir=1;
   document.getElementById('timing-overlay').classList.add('open');
   document.getElementById('timing-sub').textContent=
