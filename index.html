@@ -167,6 +167,38 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .blink{animation:blink 1.1s infinite}
 
+/* ── RIVER CROSSING GAMBLE ── */
+#gamble-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#gamble-overlay.open{display:flex}
+.gamble-panel{border:2px solid #33ff33;background:#030a03;padding:22px 26px;max-width:480px;width:90%}
+.gamble-title{font-size:14px;letter-spacing:3px;color:#fff;text-shadow:0 0 10px #33ff33;text-align:center;margin-bottom:4px}
+.gamble-sub{font-size:9px;letter-spacing:2px;color:#88ff88;text-align:center;margin-bottom:14px}
+.gamble-sect{border:1px solid #1a4a1a;padding:10px 12px;margin-bottom:10px}
+.gamble-lbl{font-size:9px;letter-spacing:2px;color:#88ff88;margin-bottom:5px}
+.gamble-val{font-size:20px;color:#fff;text-shadow:0 0 8px #33ff33;text-align:center;margin:4px 0}
+.gamble-slider{width:100%;appearance:none;background:#050f05;border:1px solid #1a4a1a;height:10px;outline:none;cursor:pointer;margin-top:4px}
+.gamble-slider::-webkit-slider-thumb{appearance:none;width:16px;height:16px;background:#33ff33;cursor:pointer}
+.gtbl{width:100%;border-collapse:collapse;font-size:10px;margin-top:6px}
+.gtbl td{padding:2px 6px;border-bottom:1px solid #050f05}
+.gtbl tr:last-child td{border:none}
+.gtbl .gs{color:#33ff33;width:32px}.gtbl .gd{color:#88ff88}.gtbl .gv{text-align:right}
+#gamble-start{display:block;margin:12px auto 0;background:transparent;border:2px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;padding:9px 22px;cursor:pointer}
+#gamble-start:hover{background:#33ff33;color:#000}
+
+#frogger-overlay{display:none;position:fixed;inset:0;background:#000;z-index:400;flex-direction:column;align-items:center;justify-content:center}
+#frogger-overlay.open{display:flex}
+#frog-hud{display:flex;justify-content:space-between;align-items:center;width:560px;max-width:90vw;margin-bottom:6px;padding:5px 10px;border:1px solid #33ff33;font-size:11px}
+#frog-timer{font-size:22px;color:#ffff33;text-shadow:0 0 8px #ffff33;letter-spacing:2px}
+#frog-timer.low{color:#ff3333;text-shadow:0 0 8px #ff3333}
+.frog-slot-row{display:flex;gap:4px}
+.frog-slot-pip{width:18px;height:18px;border:2px solid #33ff33;background:transparent}
+.frog-slot-pip.filled{background:#33ff33}
+.frog-heart{font-size:16px;line-height:1}
+.frog-heart.full{color:#ff4444;text-shadow:0 0 5px #ff4444}
+.frog-heart.empty{color:#2a0a0a}
+#frog-canvas{display:block;border:2px solid #33ff33;image-rendering:pixelated}
+#frog-hint{font-size:10px;color:#334433;margin-top:5px;letter-spacing:1px;text-align:center}
+
 /* ── FULLSCREEN BUTTON ── */
 #fs-btn{position:fixed;top:8px;right:8px;z-index:10000;background:transparent;border:1px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:10px;padding:3px 8px;cursor:pointer;letter-spacing:1px}
 #fs-btn:hover{background:#33ff33;color:#000}
@@ -352,6 +384,52 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
     <div id="alloc-rows"></div>
     <button id="alloc-confirm" onclick="confirmAlloc()">APPLY ADAPTATIONS ›</button>
   </div>
+</div>
+
+<!-- GAMBLE SETUP OVERLAY -->
+<div id="gamble-overlay">
+  <div class="gamble-panel">
+    <div class="gamble-title">RIVER CROSSING GAMBLE</div>
+    <div class="gamble-sub">A RARE OPPORTUNITY — RISK YOUR RABBITS</div>
+    <div class="gamble-sect">
+      <div class="gamble-lbl">CURRENT POPULATION</div>
+      <div class="gamble-val" id="go-pop">—</div>
+    </div>
+    <div class="gamble-sect">
+      <div class="gamble-lbl">RABBITS TO GAMBLE (MAX 50%)</div>
+      <input type="range" class="gamble-slider" id="go-slider" min="1" max="100" value="10" oninput="onGambleSlider()">
+      <div class="gamble-val"><span id="go-amt">—</span> <span style="font-size:12px;color:#88ff88">rabbits</span></div>
+    </div>
+    <div class="gamble-sect">
+      <div class="gamble-lbl">POSSIBLE OUTCOMES</div>
+      <table class="gtbl" id="go-tbl"></table>
+    </div>
+    <button id="gamble-start" onclick="startFrogger()">[ CROSS THE RIVER → ]</button>
+  </div>
+</div>
+
+<!-- FROGGER GAME OVERLAY -->
+<div id="frogger-overlay">
+  <div id="frog-hud">
+    <div>
+      <div style="font-size:9px;color:#88ff88;letter-spacing:1px">TIME</div>
+      <div id="frog-timer">40</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:9px;color:#88ff88;letter-spacing:1px;margin-bottom:4px">SLOTS</div>
+      <div class="frog-slot-row" id="frog-slot-row"></div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:9px;color:#88ff88;letter-spacing:1px;margin-bottom:3px">LIVES</div>
+      <div id="frog-lives" style="display:flex;gap:3px;justify-content:center"></div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:9px;color:#88ff88;letter-spacing:1px">GAMBLING</div>
+      <div style="font-size:13px;color:#fff" id="frog-gamble-lbl">—</div>
+    </div>
+  </div>
+  <canvas id="frog-canvas" width="560" height="400"></canvas>
+  <div id="frog-hint">↑ ↓ ← → — RIDE THE LOGS — LAND IN THE SLOTS — 3 LIVES</div>
 </div>
 
 <!-- FULLSCREEN BUTTON -->
@@ -1115,6 +1193,11 @@ function newGS(){
     currentEvent:null, pendingBoosts:0,
     pendingIslandChoice:null, timingResult:null,
     nextEvolSeason:5,
+    riverCrossSeason1: 5  + Math.floor(Math.random()*6),  // random turn in [5,10]
+    riverCrossSeason2: 12 + Math.floor(Math.random()*8),  // random turn in [12,19]
+    riverCrossDone1: false,
+    riverCrossDone2: false,
+    froggerGamble: 0,
   };
 }
 GS=newGS();
@@ -1368,6 +1451,13 @@ function nextTurn(){
   GS.turn++;
   document.getElementById('out-box').classList.remove('open');
   baseGrowth();
+  // Check river crossing gamble
+  if((GS.turn===GS.riverCrossSeason1&&!GS.riverCrossDone1)||(GS.turn===GS.riverCrossSeason2&&!GS.riverCrossDone2)){
+    if(GS.turn===GS.riverCrossSeason1)GS.riverCrossDone1=true;
+    else GS.riverCrossDone2=true;
+    setTimeout(()=>openGambleSetup(),400);
+    return;
+  }
   // Check evolution event
   if(GS.turn===GS.nextEvolSeason){
     GS.nextEvolSeason+=5;
@@ -1861,6 +1951,300 @@ document.addEventListener('fullscreenchange',()=>{
   if(!btn)return;
   btn.textContent=document.fullscreenElement?'✕ EXIT FULL':'⛶ FULLSCREEN';
 });
+
+// ═══════════════════════════════════════════════════════
+//  RIVER CROSSING MINI-GAME
+// ═══════════════════════════════════════════════════════
+const FR_CELL=40,FR_COLS=14,FR_ROWS=10,FR_CW=560,FR_CH=400;
+const FR_ROW_DEST=0,FR_ROW_BANK_TOP=1,FR_ROW_RIV_S=2,FR_ROW_RIV_E=7,FR_ROW_BANK_BOT=8,FR_ROW_START=9;
+const FR_DEST_COLS=[1,3,5,7,9,11];
+const FR_START_COL=6;
+const FR_MAX_LIVES=3;
+
+const FR_LANES=[
+  {row:2,speed:0.9,dir: 1,logW:120,gap:260},
+  {row:3,speed:3.4,dir:-1,logW: 80,gap:280},
+  {row:4,speed:1.6,dir: 1,logW:120,gap:240},
+  {row:5,speed:4.2,dir:-1,logW: 80,gap:300},
+  {row:6,speed:1.2,dir: 1,logW:160,gap:220},
+  {row:7,speed:2.8,dir:-1,logW: 80,gap:270},
+];
+
+const FR_SCORE=[
+  {mult:0,   desc:'All gambled rabbits die'},
+  {mult:0.5, desc:'50% of gambled rabbits die'},
+  {mult:1.1, desc:'Gambled rabbits +10%'},
+  {mult:1.75,desc:'Gambled rabbits +75%'},
+  {mult:2.5, desc:'Gambled rabbits +150%'},
+  {mult:3.5, desc:'Gambled rabbits +250%'},
+  {mult:6.0, desc:'Gambled rabbits +500%'},
+];
+
+const FR_SPR=[
+  "..##..",
+  "..##..",
+  ".####.",
+  ".#.##.",
+  "######",
+  ".#####",
+  "..###.",
+  "..#.#.",
+  "..#.#.",
+];
+const FR_SPR_COLS=6,FR_PW=3,FR_PH=3;
+const FR_SPR_W=FR_SPR_COLS*FR_PW,FR_SPR_H=FR_SPR.length*FR_PH;
+const FR_OX=Math.round((FR_CELL-FR_SPR_W)/2),FR_OY=Math.round((FR_CELL-FR_SPR_H)/2);
+
+let frLogs=[],frSlots=[],frLives=FR_MAX_LIVES,frTimeLeft=40;
+let frTimerInt=null,frRafId=null,frActive=false,frWave=0;
+let frRab={floatCol:FR_START_COL,row:FR_ROW_START,alive:true,drowning:false,drownT:0};
+
+function frInRiver(r){return r>=FR_ROW_RIV_S&&r<=FR_ROW_RIV_E;}
+
+function openGambleSetup(){
+  const pop=GS.pop;
+  const maxG=Math.max(1,Math.floor(pop*0.5));
+  const initG=Math.max(1,Math.floor(maxG*0.2));
+  GS.froggerGamble=initG;
+  document.getElementById('go-pop').textContent=fmtPop(pop);
+  const sl=document.getElementById('go-slider');
+  sl.max=maxG; sl.value=initG;
+  buildGambleTable(initG);
+  document.getElementById('go-amt').textContent=fmtPop(initG);
+  document.getElementById('gamble-overlay').classList.add('open');
+}
+
+function onGambleSlider(){
+  const v=+document.getElementById('go-slider').value;
+  GS.froggerGamble=v;
+  document.getElementById('go-amt').textContent=fmtPop(v);
+  buildGambleTable(v);
+}
+
+function buildGambleTable(amt){
+  document.getElementById('go-tbl').innerHTML=FR_SCORE.map((row,i)=>{
+    const survived=Math.round(amt*row.mult);
+    const change=survived-amt;
+    const cls=change>0?'pos':change<0?'neg':'neu';
+    const sign=change>=0?'+':'';
+    return`<tr><td class="gs">${i}/6</td><td class="gd">${row.desc}</td><td class="gv ${cls}">${sign}${fmtPop(Math.abs(change))}</td></tr>`;
+  }).join('');
+}
+
+function startFrogger(){
+  document.getElementById('gamble-overlay').classList.remove('open');
+  frSlots=new Array(6).fill(false);
+  frLives=FR_MAX_LIVES;
+  frActive=true; frWave=0;
+  frInitLogs();
+  frRespawn();
+  document.getElementById('frog-gamble-lbl').textContent=fmtPop(GS.froggerGamble);
+  frUpdateSlotHUD(); frUpdateLivesHUD();
+  frTimeLeft=40; frRefreshTimer();
+  document.getElementById('frogger-overlay').classList.add('open');
+  window.addEventListener('keydown',onFrogKey);
+  frTimerInt=setInterval(()=>{frTimeLeft--;frRefreshTimer();if(frTimeLeft<=0)frEndGame();},1000);
+  frRafId=requestAnimationFrame(frLoop);
+}
+
+function frInitLogs(){
+  frLogs=[];
+  FR_LANES.forEach(def=>{
+    const period=def.logW+def.gap;
+    const count=Math.ceil((FR_CW+period*2)/period)+1;
+    for(let i=0;i<count;i++){
+      const x=def.dir===1?-def.logW-def.gap+i*period:FR_CW+def.gap-i*period;
+      frLogs.push({row:def.row,x,w:def.logW,speed:def.speed,dir:def.dir});
+    }
+  });
+}
+
+function frUpdateLogs(){
+  const BUF=60;
+  frLogs.forEach(l=>{
+    l.x+=l.speed*l.dir;
+    if(l.dir===1&&l.x>FR_CW+BUF)l.x=-l.w-BUF;
+    if(l.dir===-1&&l.x+l.w<-BUF)l.x=FR_CW+BUF;
+  });
+}
+
+function frLogUnder(){
+  const cx=(frRab.floatCol+0.5)*FR_CELL;
+  return frLogs.find(l=>l.row===frRab.row&&cx>l.x+4&&cx<l.x+l.w-4)||null;
+}
+
+function frRespawn(){
+  if(!frActive)return;
+  frRab={floatCol:FR_START_COL,row:FR_ROW_START,alive:true,drowning:false,drownT:0};
+}
+
+function frDrown(){
+  if(frRab.drowning)return;
+  frRab.drowning=true; frRab.drownT=55;
+  frLives--; frUpdateLivesHUD();
+  if(frLives<=0){setTimeout(frEndGame,900);}else{setTimeout(frRespawn,900);}
+}
+
+function frTryMove(dc,dr){
+  if(!frActive||!frRab.alive||frRab.drowning)return;
+  let newCol=frRab.floatCol+dc;
+  const newRow=frRab.row+dr;
+  if(newRow<FR_ROW_DEST||newRow>FR_ROW_START)return;
+  if(frRab.row===FR_ROW_BANK_TOP&&dc!==0)return;
+  if(!frInRiver(newRow))newCol=Math.round(newCol);
+  if(newRow===FR_ROW_DEST){newCol=Math.round(newCol);if(!FR_DEST_COLS.includes(newCol))return;}
+  if(newCol<0||newCol>=FR_COLS)return;
+  frRab.floatCol=newCol; frRab.row=newRow;
+  if(frRab.row===FR_ROW_DEST){
+    const idx=FR_DEST_COLS.indexOf(Math.round(frRab.floatCol));
+    if(idx!==-1){
+      frSlots[idx]=true; frUpdateSlotHUD();
+      frRab.alive=false;
+      if(frSlots.every(Boolean)){frEndGame();return;}
+      setTimeout(frRespawn,350);
+    }
+  }
+}
+
+function frUpdateRabbit(){
+  if(!frActive||!frRab.alive)return;
+  if(frRab.drowning){frRab.drownT--;return;}
+  if(frInRiver(frRab.row)){
+    const log=frLogUnder();
+    if(log){
+      frRab.floatCol+=(log.speed*log.dir)/FR_CELL;
+      if(frRab.floatCol<-0.6||frRab.floatCol>FR_COLS-0.4)frDrown();
+    }else{frDrown();}
+  }
+}
+
+function frDrawSprite(ctx,px,py,color){
+  ctx.fillStyle=color;
+  const ox=px+FR_OX,oy=py+FR_OY;
+  FR_SPR.forEach((row,r)=>[...row].forEach((ch,c)=>{
+    if(ch==='#')ctx.fillRect(ox+c*FR_PW,oy+r*FR_PH,FR_PW,FR_PH);
+  }));
+}
+
+function frDraw(){
+  const ctx=document.getElementById('frog-canvas').getContext('2d');
+  frWave+=0.04;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,FR_CW,FR_CH);
+
+  // Start zone
+  ctx.fillStyle='#030803';ctx.fillRect(0,FR_ROW_START*FR_CELL,FR_CW,FR_CELL);
+  ctx.fillStyle='#0a1a0a';ctx.fillRect(0,FR_ROW_START*FR_CELL,FR_CW,2);
+  FR_DEST_COLS.forEach(dc=>{
+    ctx.fillStyle='#0a2a0a';
+    ctx.fillRect(dc*FR_CELL+14,FR_ROW_START*FR_CELL+26,12,7);
+    ctx.fillRect(dc*FR_CELL+10,FR_ROW_START*FR_CELL+20,20,6);
+    ctx.fillRect(dc*FR_CELL+6, FR_ROW_START*FR_CELL+14,28,6);
+  });
+
+  // Bottom bank
+  ctx.fillStyle='#061206';ctx.fillRect(0,FR_ROW_BANK_BOT*FR_CELL,FR_CW,FR_CELL);
+  ctx.fillStyle='#1a3a1a';ctx.fillRect(0,FR_ROW_BANK_BOT*FR_CELL,FR_CW,2);
+
+  // River
+  for(let row=FR_ROW_RIV_S;row<=FR_ROW_RIV_E;row++){
+    const ry=row*FR_CELL;
+    ctx.fillStyle='#00111e';ctx.fillRect(0,ry,FR_CW,FR_CELL);
+    ctx.fillStyle='#001e33';
+    for(let wx=0;wx<FR_CW+20;wx+=22){
+      const sx=wx+Math.sin(frWave+row*1.3+wx*0.05)*5;
+      ctx.fillRect(sx|0,ry+10,14,2);ctx.fillRect((sx+6)|0,ry+FR_CELL-12,14,2);
+    }
+  }
+
+  // Top bank
+  ctx.fillStyle='#061206';ctx.fillRect(0,FR_ROW_BANK_TOP*FR_CELL,FR_CW,FR_CELL);
+  ctx.fillStyle='#1a3a1a';ctx.fillRect(0,(FR_ROW_BANK_TOP+1)*FR_CELL-2,FR_CW,2);
+
+  // Dest row
+  ctx.fillStyle='#0a2a0a';ctx.fillRect(0,FR_ROW_DEST*FR_CELL,FR_CW,FR_CELL);
+  for(let c=0;c<FR_COLS;c++){
+    if(!FR_DEST_COLS.includes(c)){ctx.fillStyle='#1a4a1a';ctx.fillRect(c*FR_CELL,FR_ROW_DEST*FR_CELL,FR_CELL,FR_CELL);}
+  }
+  FR_DEST_COLS.forEach((dc,i)=>{
+    const sx=dc*FR_CELL,sy=FR_ROW_DEST*FR_CELL;
+    if(frSlots[i]){ctx.fillStyle='#0a2a0a';ctx.fillRect(sx,sy,FR_CELL,FR_CELL);frDrawSprite(ctx,sx,sy,'#33ff33');}
+    else{ctx.fillStyle='#000';ctx.fillRect(sx+2,sy+2,FR_CELL-4,FR_CELL-4);ctx.strokeStyle='#33ff33';ctx.lineWidth=2;ctx.strokeRect(sx+3,sy+3,FR_CELL-6,FR_CELL-6);}
+  });
+
+  // Logs — brown
+  frLogs.forEach(log=>{
+    const ly=log.row*FR_CELL;
+    ctx.fillStyle='#5c3317';ctx.fillRect(log.x,ly+6,log.w,FR_CELL-12);
+    ctx.fillStyle='#7a4520';ctx.fillRect(log.x+2,ly+9,log.w-4,3);ctx.fillRect(log.x+2,ly+FR_CELL-16,log.w-4,3);
+    ctx.fillStyle='#3d2010';ctx.fillRect(log.x,ly+6,7,FR_CELL-12);ctx.fillRect(log.x+log.w-7,ly+6,7,FR_CELL-12);
+    ctx.fillStyle='#8b5e3c';ctx.fillRect(log.x+7,ly+6,log.w-14,2);
+  });
+
+  // Guide lines
+  ctx.setLineDash([3,6]);ctx.lineWidth=1;
+  FR_DEST_COLS.forEach((dc,i)=>{
+    if(!frSlots[i]){ctx.strokeStyle='#0a2a0a';ctx.beginPath();ctx.moveTo(dc*FR_CELL+FR_CELL/2,FR_ROW_BANK_TOP*FR_CELL+FR_CELL);ctx.lineTo(dc*FR_CELL+FR_CELL/2,FR_ROW_BANK_BOT*FR_CELL);ctx.stroke();}
+  });
+  ctx.setLineDash([]);
+
+  // Direction arrows
+  ctx.font='9px monospace';ctx.textBaseline='top';
+  FR_LANES.forEach(def=>{ctx.fillStyle='#0a2a15';ctx.fillText(def.dir===1?'→':'←',4,def.row*FR_CELL+4);});
+
+  // Rabbit
+  if(!frRab.drowning&&frRab.alive){
+    frDrawSprite(ctx,frRab.floatCol*FR_CELL,frRab.row*FR_CELL,'#33ff33');
+  }else if(frRab.drowning){
+    const prog=1-frRab.drownT/55;
+    if(Math.floor(frRab.drownT/5)%2===0)frDrawSprite(ctx,frRab.floatCol*FR_CELL,frRab.row*FR_CELL+prog*20,'#ff3333');
+  }
+}
+
+function frLoop(){
+  if(!frActive)return;
+  frUpdateLogs();frUpdateRabbit();frDraw();
+  frRafId=requestAnimationFrame(frLoop);
+}
+
+function onFrogKey(e){
+  const MAP={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],KeyW:[0,-1],KeyS:[0,1],KeyA:[-1,0],KeyD:[1,0]};
+  const mv=MAP[e.code];if(mv){e.preventDefault();frTryMove(mv[0],mv[1]);}
+}
+
+function frRefreshTimer(){
+  const el=document.getElementById('frog-timer');
+  el.textContent=frTimeLeft;
+  el.className=frTimeLeft<=10?'low blink':'';
+}
+
+function frUpdateSlotHUD(){
+  document.getElementById('frog-slot-row').innerHTML=frSlots.map(s=>`<div class="frog-slot-pip${s?' filled':''}"></div>`).join('');
+}
+
+function frUpdateLivesHUD(){
+  document.getElementById('frog-lives').innerHTML=Array.from({length:FR_MAX_LIVES},(_,i)=>
+    `<span class="frog-heart ${i<frLives?'full':'empty'}">♥</span>`).join('');
+}
+
+function frEndGame(){
+  frActive=false;
+  clearInterval(frTimerInt);
+  cancelAnimationFrame(frRafId);
+  window.removeEventListener('keydown',onFrogKey);
+  document.getElementById('frogger-overlay').classList.remove('open');
+
+  const landed=frSlots.filter(Boolean).length;
+  const row=FR_SCORE[landed];
+  const gambled=GS.froggerGamble;
+  const survived=Math.round(gambled*row.mult);
+  const change=survived-gambled;
+  GS.pop=Math.max(5,GS.pop+change);
+  GS.log.push({season:GS.turn,event:'RIVER CROSSING GAMBLE',choice:`${landed}/6 rabbits crossed — ${row.desc}`});
+
+  const sign=change>=0?'+':'';
+  const outcomeText=`${landed}/6 rabbits crossed the river. ${row.desc}. Population ${sign}${fmtPop(Math.abs(change))}.`;
+  showOutcomeOverlay({out:outcomeText},{},`RIVER CROSSING — ${landed}/6 SLOTS`,'GAMBLE EVENT');
+}
 
 function restart(){GS=newGS();showScreen('title')}
 </script>
