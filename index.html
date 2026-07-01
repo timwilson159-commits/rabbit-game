@@ -1456,7 +1456,7 @@ function showOutcome(choice,fx){
 //  EVOLUTION RUNNER MINI-GAME
 // ═══════════════════════════════════════════════════════
 let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:3,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
-const RC_W=580,RC_H=150,R_GNDH=110,R_X=70,R_W=18,R_H=14,JUMP_V=-11,GRAV=.6,MAX_RUN_MS=120000;
+const RC_W=580,RC_H=150,R_GNDH=110,R_X=70,R_W=18,R_H=14,JUMP_V=11,GRAV=.6,MAX_RUN_MS=120000;
 
 function openRunner(){
   document.getElementById('runner-gameover').style.display='none';
@@ -1478,7 +1478,7 @@ function runnerLoop(ts){
   const elapsed=ts-RR.startTs;
   if(elapsed>=MAX_RUN_MS){endRunner(true);return}
   // Physics
-  RR.vy+=GRAV;RR.y=Math.max(0,RR.y+RR.vy);
+  RR.vy-=GRAV;RR.y=Math.max(0,RR.y+RR.vy);
   if(RR.y===0)RR.vy=0;
   // Speed ramp
   RR.speed=3+Math.min(10,elapsed/12000);
