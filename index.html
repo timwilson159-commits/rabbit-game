@@ -1481,13 +1481,13 @@ function showOutcome(choice,fx){
 // ═══════════════════════════════════════════════════════
 //  EVOLUTION RUNNER MINI-GAME
 // ═══════════════════════════════════════════════════════
-let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:4.5,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
+let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:6,spawnT:60,rafId:null,startTs:0,pts:1,frame:0};
 const RC_W=580,RC_H=150,R_GNDH=110,R_X=70,R_W=18,R_H=14,JUMP_V=11,GRAV=.6,MAX_RUN_MS=120000;
 
 function openRunner(){
   document.getElementById('runner-gameover').style.display='none';
   document.getElementById('runner-go').style.display='none';
-  RR={active:true,y:0,vy:0,obs:[],dist:0,speed:4.5,spawnT:80,rafId:null,startTs:0,pts:1,frame:0};
+  RR={active:true,y:0,vy:0,obs:[],dist:0,speed:6,spawnT:60,rafId:null,startTs:0,pts:1,frame:0};
   document.getElementById('runner-overlay').classList.add('open');
   window.addEventListener('keydown',runnerKey);
   const cvs=document.getElementById('runner-canvas');
@@ -1507,14 +1507,14 @@ function runnerLoop(ts){
   RR.vy-=GRAV;RR.y=Math.max(0,RR.y+RR.vy);
   if(RR.y===0)RR.vy=0;
   // Speed ramp
-  RR.speed=4.5+Math.min(10,elapsed/12000);
+  RR.speed=6+Math.min(18,elapsed/4000);
   // Spawn
   RR.spawnT--;
   if(RR.spawnT<=0){
     const h=18+Math.random()*22;
     RR.obs.push({x:RC_W,w:10,h});
-    const gap=Math.max(20,75-elapsed/2000);
-    RR.spawnT=Math.floor(gap+Math.random()*40);
+    const gap=Math.max(12,65-elapsed/800);
+    RR.spawnT=Math.floor(gap+Math.random()*20);
   }
   // Move obs
   RR.obs=RR.obs.filter(o=>{o.x-=RR.speed;return o.x>-20});
