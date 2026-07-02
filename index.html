@@ -116,6 +116,19 @@ body{background:#0a0a0a;color:#33ff33;font-family:'Courier New',monospace;min-he
 #timing-result{font-size:16px;margin-top:12px;min-height:24px;text-align:center}
 #timing-cont{display:none;margin-top:10px;background:transparent;border:1px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;padding:8px 20px;cursor:pointer}
 
+/* ── HAIL MARY: THE GREAT LEAP ── */
+#hailmary-setup-overlay,#hailmary-result-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#hailmary-setup-overlay.open,#hailmary-result-overlay.open{display:flex}
+#hailmary-game-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+#hailmary-game-overlay.open{display:flex}
+#hmj-title{font-size:16px;letter-spacing:2px;color:#ffff33;text-shadow:0 0 10px #ffaa00;margin-bottom:5px;text-align:center}
+#hmj-hud{width:380px;max-width:92vw;display:flex;justify-content:space-between;font-size:11px;color:#88ff88;margin-bottom:5px;letter-spacing:1px}
+#hmj-canvas{border:2px solid #33ff33;background:#000;touch-action:none;max-width:92vw;max-height:66vh;aspect-ratio:380/520}
+#hmj-status{width:380px;max-width:92vw;font-size:12px;color:#ffff55;text-align:center;margin-top:6px;min-height:16px}
+#hmj-hint{width:380px;max-width:92vw;font-size:10px;color:#334433;text-align:center;margin-top:2px}
+#hmj-cont-btn{display:none;margin-top:10px;background:transparent;border:2px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;padding:9px 22px;cursor:pointer}
+#hmj-cont-btn:hover{background:#33ff33;color:#000}
+
 /* ── STAT ALLOC OVERLAY ── */
 #alloc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:400;flex-direction:column;align-items:center;justify-content:center}
 #alloc-overlay.open{display:flex}
@@ -426,6 +439,7 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
   <div class="gamble-panel" style="max-width:560px">
     <div class="gamble-title">QUICK CHECK</div>
     <div class="gamble-sub" id="mcq-topic"></div>
+    <div id="mcq-def" style="display:none;font-size:11px;color:#88ff88;line-height:1.55;border:1px solid #1a4a1a;background:#050f05;padding:8px 10px;margin:10px 0 0"></div>
     <div id="mcq-q" style="color:#fff;font-size:14px;margin:10px 0 14px;line-height:1.5"></div>
     <div id="mcq-opts"></div>
     <div id="mcq-result" style="font-size:12px;margin-top:10px;line-height:1.6"></div>
@@ -475,6 +489,52 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
       <table class="gtbl" id="go-tbl"></table>
     </div>
     <button id="gamble-start" onclick="startFrogger()">[ CROSS THE RIVER → ]</button>
+  </div>
+</div>
+
+<!-- HAIL MARY: THE GREAT LEAP -->
+<div id="hailmary-setup-overlay">
+  <div class="gamble-panel">
+    <div class="gamble-title" style="color:#ffff33">⚡ THE GREAT LEAP — A HAIL MARY ⚡</div>
+    <div class="gamble-sub">ONE FINAL, DESPERATE PUSH FOR THE CONTINENT</div>
+    <div class="gamble-sect" style="font-size:12px;color:#ccffcc;line-height:1.6">
+      The seasons are almost gone. A portion of your colony makes a frantic dash across a chain of shifting ground — a population exploding across the landscape faster than anything can stop it. Commit rabbits to the leap. The further they climb, the greater the surge in numbers and territory. Miss a step and those rabbits are lost.
+    </div>
+    <div class="gamble-sect">
+      <div class="gamble-lbl">CURRENT POPULATION</div>
+      <div class="gamble-val" id="hm-pop">—</div>
+    </div>
+    <div class="gamble-sect">
+      <div class="gamble-lbl">RABBITS TO COMMIT (MAX 70%)</div>
+      <input type="range" class="gamble-slider" id="hm-slider" min="1" max="100" value="30" oninput="onHailMarySlider()">
+      <div class="gamble-val"><span id="hm-amt">—</span> <span style="font-size:12px;color:#88ff88">rabbits</span></div>
+    </div>
+    <div class="gamble-sect">
+      <div class="gamble-lbl">POSSIBLE OUTCOMES (BY LEVELS CLEARED)</div>
+      <table class="gtbl" id="hm-tbl"></table>
+    </div>
+    <button onclick="startHailMary()" style="display:block;margin:12px auto 0;background:transparent;border:2px solid #ffff33;color:#ffff33;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;padding:9px 22px;cursor:pointer">[ BEGIN THE LEAP → ]</button>
+  </div>
+</div>
+
+<div id="hailmary-game-overlay">
+  <div id="hmj-title">THE GREAT LEAP</div>
+  <div id="hmj-hud">
+    <span>LEVEL <span id="hmj-level">1</span>/4 &nbsp; STEP <span id="hmj-streak">0</span>/<span id="hmj-jpl">5</span></span>
+    <span id="hmj-committed">—</span>
+  </div>
+  <canvas id="hmj-canvas" width="380" height="520"></canvas>
+  <div id="hmj-status">Press SPACE or tap to jump onto the moving ground</div>
+  <div id="hmj-hint">SPACEBAR or TAP/CLICK to jump — land 5 in a row to clear each level</div>
+  <button id="hmj-cont-btn" onclick="resolveHailMary()">[ SEE THE RESULT → ]</button>
+</div>
+
+<div id="hailmary-result-overlay">
+  <div class="gamble-panel">
+    <div class="gamble-title" id="hmres-title"></div>
+    <div class="gamble-sub" id="hmres-sub"></div>
+    <div id="hmres-body" style="font-size:13px;color:#ccffcc;line-height:1.8;margin:14px 0;text-align:center"></div>
+    <button onclick="closeHailMaryResults()" style="display:block;margin:12px auto 0;background:transparent;border:2px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;padding:9px 22px;cursor:pointer">[ CONTINUE ]</button>
   </div>
 </div>
 
@@ -821,6 +881,31 @@ const LOCATIONS=[
    bonus:{bravery:2,size:1},spawnRow:1,spawnCol:19},
 ];
 
+// Every region's cell coordinates on the map, and a "seed" cell each region's
+// colonisation grows outward from. Mainland regions reuse their canonical
+// LOCATIONS spawn point; island regions (no LOCATIONS entry) get a computed
+// centroid instead — avoids hand-counting map columns for tiny regions.
+const REGION_CELLS={};
+MAP_ROWS.forEach((row,r)=>{
+  [...row].forEach((ch,c)=>{
+    if(REGION[ch])(REGION_CELLS[ch]=REGION_CELLS[ch]||[]).push([r,c]);
+  });
+});
+const REGION_SEED={};
+LOCATIONS.forEach(l=>{REGION_SEED[l.region]={row:l.spawnRow,col:l.spawnCol}});
+Object.keys(REGION_CELLS).forEach(id=>{
+  if(REGION_SEED[id])return;
+  const cells=REGION_CELLS[id];
+  const avgR=cells.reduce((s,c)=>s+c[0],0)/cells.length;
+  const avgC=cells.reduce((s,c)=>s+c[1],0)/cells.length;
+  let best=cells[0],bestD=Infinity;
+  for(const c of cells){
+    const d=(c[0]-avgR)**2+(c[1]-avgC)**2;
+    if(d<bestD){bestD=d;best=c;}
+  }
+  REGION_SEED[id]={row:best[0],col:best[1]};
+});
+
 const POP_CHOICES=[
   {id:'small',label:'Small Party — 50 Rabbits',pop:50,growMod:0.9,
    statFx:{diseaseResistance:1,predatorDefense:1},
@@ -898,45 +983,47 @@ function championStory(statKey,value){
 // Embedded biology check-ins — a quick MCQ tied to specific events, asked once
 // per game the first time that event fires. Welds the gameplay moment directly
 // to the concept it's demonstrating. Correct answers grant a small genetics bonus.
+const AB_DEF='KEY TERMS — An ABIOTIC factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A BIOTIC factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism).';
 const MCQ_BANK={
   // ── ABIOTIC vs BIOTIC FACTOR IDENTIFICATION ──
   // Same 4-option template throughout so students learn the pattern:
   // classify the factor as abiotic/biotic, AND predict the population effect.
   // Both key terms are defined in every question — no assumed prior teaching.
-  first_winter:{topic:'ABIOTIC OR BIOTIC?',
-    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). A sudden cold snap kills many kits overnight. Is "cold temperature" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+  first_winter:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'A sudden cold snap kills many kits overnight. Is "cold temperature" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
     options:['Abiotic factor — likely to decrease the population','Abiotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Biotic factor — likely to increase the population'],
     correct:0,bonusStat:'droughtResistance',
     explain:'Temperature is non-living, so this is an ABIOTIC factor. Cold kills vulnerable individuals (especially young kits), decreasing the population — but survivors tend to have better cold/heat tolerance, which gets passed on.'},
-  eagle_attack:{topic:'ABIOTIC OR BIOTIC?',
-    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). Wedge-tailed eagles begin hunting rabbits that stray from their burrows. Is "eagle predation" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+  eagle_attack:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'Wedge-tailed eagles begin hunting rabbits that stray from their burrows. Is "eagle predation" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
     options:['Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to decrease the population'],
     correct:2,bonusStat:'predatorDefense',
     explain:'A predator is a living organism, so predation is a BIOTIC factor. It directly removes individuals from the population, decreasing it — and selects for rabbits with better predator defence and camouflage.'},
-  first_drought:{topic:'ABIOTIC OR BIOTIC?',
-    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). The rains fail completely and waterholes dry up. Is "drought" (lack of water) abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+  first_drought:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'The rains fail completely and waterholes dry up. Is "drought" (lack of water) abiotic or biotic, and what effect would it most likely have on the rabbit population?',
     options:['Biotic factor — likely to decrease the population','Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population','Abiotic factor — likely to decrease the population'],
     correct:3,bonusStat:'droughtResistance',
     explain:'Water availability is non-living, so drought is an ABIOTIC factor. Less water means less food and more deaths, decreasing the population — while survivors tend to have stronger drought tolerance.'},
-  dingo_pack:{topic:'ABIOTIC OR BIOTIC?',
-    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). A pack of dingoes learns where your warrens are and hunts every evening. Is "dingo predation" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+  dingo_pack:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'A pack of dingoes learns where your warrens are and hunts every evening. Is "dingo predation" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
     options:['Abiotic factor — likely to decrease the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population'],
     correct:1,bonusStat:'predatorDefense',
     explain:'Dingoes are living organisms, so this is a BIOTIC factor (predation). It reduces the population directly, and survivors tend to be more cautious or better defended.'},
-  flooding:{topic:'ABIOTIC OR BIOTIC?',
-    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). Unprecedented rainfall floods the river systems, drowning low-lying warrens. Is "flooding" abiotic or biotic, and what is its IMMEDIATE effect on the rabbit population?',
+  flooding:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'Unprecedented rainfall floods the river systems, drowning low-lying warrens. Is "flooding" abiotic or biotic, and what is its IMMEDIATE effect on the rabbit population?',
     options:['Biotic factor — likely to increase the population','Abiotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to decrease the population'],
     correct:3,bonusStat:'migrationSpeed',
     explain:'Water is non-living, so flooding is an ABIOTIC factor. The immediate effect is a population decrease from drowning — though the nutrient-rich soil left behind can cause a boom afterwards. Abiotic factors can have both negative and positive knock-on effects.'},
-  native_comp:{topic:'ABIOTIC OR BIOTIC?',
-    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). Native bilbies and bettongs are competing with rabbits for the same burrows and limited food. Is "competition between species" abiotic or biotic, and what effect does competition usually have on the population being outcompeted?',
+  native_comp:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'Native bilbies and bettongs are competing with rabbits for the same burrows and limited food. Is "competition between species" abiotic or biotic, and what effect does competition usually have on the population being outcompeted?',
     options:['Abiotic factor — likely to decrease that population','Biotic factor — likely to increase that population','Abiotic factor — likely to increase that population','Biotic factor — likely to decrease that population'],
     correct:3,bonusStat:'foodFinding',
     explain:'Competition between living species is a BIOTIC factor. When two species compete for the same limited resources, the less successful competitor\'s population tends to decrease — part of why rabbits are so damaging to Australia\'s native wildlife.'},
 
   // ── SELECTION & GENETICS CONCEPTS ──
   myxomatosis:{topic:'NATURAL SELECTION',
-    q:'Natural selection is the process where individuals with helpful traits are more likely to survive and reproduce, so those traits become more common in the next generation. Myxomatosis kills up to 99% of a naive rabbit population. Why did the SURVIVORS have higher disease resistance than the population as a whole started with?',
+    def:'KEY TERM — Natural selection: individuals with helpful traits are more likely to survive and reproduce, so those traits become more common in the next generation.',
+    q:'Myxomatosis kills up to 99% of a naive rabbit population. Why did the SURVIVORS have higher disease resistance than the population as a whole started with?',
     options:['They took medicine to protect themselves','The disease killed the least-resistant individuals first, leaving more resistant survivors to reproduce','Rabbits deliberately evolved resistance because they needed it','Resistance was inherited directly from the original 24 rabbits'],
     correct:1,bonusStat:'diseaseResistance',
     explain:'This is natural selection: the virus removed the least-fit individuals. It didn\'t "give" anyone resistance — it revealed variation that already existed and changed which traits became common.'},
@@ -946,6 +1033,7 @@ const MCQ_BANK={
     correct:1,bonusStat:'diseaseResistance',
     explain:'Natural selection — a non-random process driven by the environment (the virus). Genetic drift, by contrast, is random and matters most in small populations; you may see that one appear in its own event.'},
   overpopulation:{topic:'COMPETITION',
+    def:'KEY TERM — Competition: when organisms need the same limited resource (such as food, water, or space) and there is not enough for all of them.',
     q:'In "Too Many Mouths," a famine begins because there isn\'t enough food for everyone. Why did larger, better-food-finding rabbits survive at higher rates?',
     options:['Farmers fed them directly','They could out-compete others for scarce food and space','They migrated away entirely before the famine hit','It was random chance, unrelated to their traits'],
     correct:1,bonusStat:'foodFinding',
@@ -956,7 +1044,8 @@ const MCQ_BANK={
     correct:1,bonusStat:'litterSize',
     explain:'This is density-dependent compensation: reducing population density below what the land can support frees up resources, and survivors respond with higher reproduction.'},
   genetic_drift:{topic:'KEY TERM',
-    q:'Genetic drift is a RANDOM change in how common a trait is in a population — it is NOT caused by natural selection (i.e. it isn\'t because the trait helped anyone survive). What makes genetic drift especially powerful in SMALL populations?',
+    def:'KEY TERM — Genetic drift is a RANDOM change in how common a trait is in a population. It is NOT caused by natural selection (it isn\'t because the trait helped anyone survive).',
+    q:'What makes genetic drift especially powerful in SMALL populations?',
     options:['Small populations have no genetic variation at all','In small populations, random chance has a much bigger relative effect on which genes get passed to the next generation','Small populations physically cannot reproduce','Predators specifically target small populations'],
     correct:1,bonusStat:null,
     explain:'In a huge population, random ups and downs average out. In a small one, a handful of individuals breeding (or not) can shift the whole gene pool by chance alone — no selective advantage required.'},
@@ -1091,7 +1180,7 @@ const EVENTS=[
      fx:{selectStat:'camouflage',baseMortality:.11,statDeltas:{litterSize:-.5}}},
    ]},
 
-  {id:'rabbit_proof_fence',phase:'mid',cat:'HUMAN IMPACT',sprite:'fence',
+  {id:'rabbit_proof_fence',phase:'mid',cat:'HUMAN IMPACT',sprite:'fence',minSeason:13,
    title:'THE GREAT FENCE',
    body:'The government has constructed an extraordinary barrier — the Rabbit-Proof Fence stretches over 3,000 km from north to south, designed to prevent your spread into Western Australia\'s farmland. It is the longest fence ever built.',
    choices:[
@@ -1106,7 +1195,7 @@ const EVENTS=[
      fx:{popMult:2.0,statDeltas:{litterSize:1,droughtResistance:.5}}},
    ]},
 
-  {id:'myxomatosis',phase:'mid',cat:'DISEASE EVENT',sprite:'virus',dramatic:true,
+  {id:'myxomatosis',phase:'mid',cat:'DISEASE EVENT',sprite:'virus',dramatic:true,minSeason:15,
    title:'THE INVISIBLE KILLER',
    body:'Scientists have released myxomatosis — spread by mosquitoes, causing grotesque facial swelling and blindness. In naive populations, mortality reaches 99%. The disease is sweeping through colonies like wildfire. Your rabbits are dying in the thousands.',
    choices:[
@@ -1185,7 +1274,7 @@ const EVENTS=[
    ]},
 
   // LATE
-  {id:'khaleesi',phase:'late',cat:'DISEASE EVENT',sprite:'skull',dramatic:true,
+  {id:'khaleesi',phase:'late',cat:'DISEASE EVENT',sprite:'skull',dramatic:true,minSeason:24,requires:'myxomatosis',
    title:'THE SECOND PLAGUE',
    body:'A new biological weapon has been deployed: RHDV2 — the Calicivirus. It kills within 48 hours. No mosquito needed — it spreads through contact, insects, and soil. Mortality in non-resistant populations reaches 95%.',
    choices:[
@@ -1271,7 +1360,7 @@ const EVENTS=[
    ]},
 
   // ANY PHASE (cyclic-capable or one-shots)
-  {id:'poison_bait',phase:'any',cat:'HUMAN IMPACT',sprite:'skull',
+  {id:'poison_bait',phase:'any',cat:'HUMAN IMPACT',sprite:'skull',minSeason:8,
    title:'THE POISONED GRAIN',
    body:'A 1080 sodium fluoroacetate baiting program has begun. Poisoned grain is scattered across millions of hectares. It is colourless, odourless, and lethal within hours.',
    choices:[
@@ -1319,7 +1408,7 @@ const EVENTS=[
      bigWin:'Perfect timing. First rains hit ash-enriched soil and the grass is impossibly rich green. An extraordinary boom follows — the fire was the best thing that ever happened to this colony.'},
    ]},
 
-  {id:'cull',phase:'any',cat:'HUMAN IMPACT',sprite:'bulldozer',
+  {id:'cull',phase:'any',cat:'HUMAN IMPACT',sprite:'bulldozer',minSeason:12,
    title:'THE GREAT CULL',
    body:'A coordinated national rabbit-control program has launched — poison, trapping, fumigation, and aerial shooting. The government has declared your species the primary threat to the Australian environment.',
    choices:[
@@ -1396,6 +1485,12 @@ const EVENTS=[
 // ═══════════════════════════════════════════════════════
 let GS;
 
+// ── TESTING TOGGLE ──
+// Set to a season number to force THE GREAT LEAP (hail mary) to fire early.
+// e.g. 2 = triggers on the 2nd season so you can test it without a full run.
+// Set back to null for normal play (fires at a random season in 24–27).
+const HAILMARY_TEST_SEASON = null;
+
 function newGS(){
   return {
     turn:0, pop:0, territory:0,
@@ -1408,6 +1503,7 @@ function newGS(){
            size:2.5,migrationSpeed:2.5,diseaseResistance:2.5,camouflage:2.5,litterSize:2.5},
     diseaseExposures:0, poisonExposures:0, cullBoostTurns:0, champions:[], championedStats:new Set(),
     mcqAsked:new Set(), currentMCQ:null,
+    regionEntry:{}, // regionId -> {turn, pop} at the moment it was first settled — drives gradual coverage growth
     nativeImpact:0, // 0-100, rises as population/territory grow — see NATIVES
     nativesLost:new Set(), // extinctions are permanent even if impact later "improves"
     lineageName:'',
@@ -1423,6 +1519,10 @@ function newGS(){
     riverCrossDone1: false,
     riverCrossDone2: false,
     froggerGamble: 0,
+    hailMarySeason: HAILMARY_TEST_SEASON ?? (24 + Math.floor(Math.random()*4)), // random turn in [24,27] unless test override set
+    hailMaryDone: false,
+    hailMaryCommit: 0,
+    hailMaryLevels: 0,
   };
 }
 GS=newGS();
@@ -1488,12 +1588,39 @@ function bellCurveSVG(mean,spread,w,h,cullFrac){
   svg+='</svg>';
   return svg;
 }
+// Colonisation of a region grows gradually from its seed cell rather than
+// claiming the whole region the instant it's entered. Radius = a starting
+// foothold sized by the population that moved in, plus steady growth over
+// time — same pattern the starting zone already used, generalised to every
+// region (including the starting one, which gets a small pop-based bonus too).
+function regionCoverageRadius(regionId){
+  const entry=GS.regionEntry[regionId];
+  if(!entry)return 99; // safety fallback — should never happen, but never silently zero out territory
+  const popBonus=Math.max(0,Math.min(5,Math.floor(Math.log10(Math.max(10,entry.pop)))-1));
+  // Growth rate (+1 radius per 2 turns) is calibrated against the largest region
+  // on the map (Western Australia, ~15 cells from its seed at the far corner) —
+  // a turn-0 home-region start must be able to reach every cell by season 30
+  // for 100% territory to remain achievable at all.
+  const timeBonus=Math.floor((GS.turn-entry.turn)/2);
+  return Math.min(20,popBonus+timeBonus);
+}
+function regionCoverageFraction(regionId){
+  const cells=REGION_CELLS[regionId];
+  const seed=REGION_SEED[regionId];
+  if(!cells||!cells.length||!seed)return 1;
+  const radius=regionCoverageRadius(regionId);
+  let covered=0;
+  for(const[r,c] of cells){
+    if(Math.max(Math.abs(r-seed.row),Math.abs(c-seed.col))<=radius)covered++;
+  }
+  return covered/cells.length;
+}
 function calcTerritory(){
-  const occ=GS.regions.reduce((s,id)=>s+(REGION[id]?.km2||0),0);
+  const occ=GS.regions.reduce((s,id)=>s+(REGION[id]?.km2||0)*regionCoverageFraction(id),0);
   return parseFloat(Math.min(100,(occ/TOTAL_KM2)*100).toFixed(2));
 }
-function totalDensityUnits(){return GS.regions.reduce((s,id)=>s+rUnits(id),0)}
-function minViablePop(){return totalDensityUnits()}// 1 rabbit per density unit
+function totalDensityUnits(){return GS.regions.reduce((s,id)=>s+rUnits(id)*regionCoverageFraction(id),0)}
+function minViablePop(){return Math.ceil(totalDensityUnits())}// 1 rabbit per density unit
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
@@ -1569,6 +1696,7 @@ function initGame(){
   Object.entries(repro.statFx).forEach(([k,v])=>adjStat(k,v));
   boosts.forEach(id=>adjStat(id,2));
   GS.regions=[loc.region];
+  GS.regionEntry[loc.region]={turn:0,pop:GS.pop};
   GS.territory=calcTerritory();
   GS.prevPop=GS.pop;
   GS.history.push({season:0,pop:GS.pop,territory:GS.territory,event:''});
@@ -1667,16 +1795,20 @@ function drawMap(){
     for(const ch of row){
       if(ch==='.'){html+='<span class="cs"></span>';ci++;continue}
       if(GS.fadingRegions[ch]){html+=`<span class="cf" title="${REGION[ch]?.name} — LOW DENSITY WARNING"></span>`;ci++;continue}
-      // Home region: expands outward from spawn cell (radius grows 1 per 3 turns → 1 cell at turn 0)
-      if(ch===startReg&&spawnRow!=null){
-        const dist=Math.max(Math.abs(ri-spawnRow),Math.abs(ci-spawnCol));
-        const homeRadius=Math.min(10,Math.floor(GS.turn/3));
-        if(dist===0){html+=`<span class="cx" title="${REGION[ch]?.name} — STARTING ZONE"></span>`;}
-        else if(dist<=homeRadius&&GS.regions.includes(ch)){html+=`<span class="co" title="${REGION[ch]?.name}"></span>`;}
-        else{html+=`<span class="cu" title="${REGION[ch]?.name}"></span>`;}
+      // Colonisation grows outward from each region's seed cell rather than
+      // claiming the whole region instantly — same mechanic for every region.
+      if(GS.regions.includes(ch)){
+        const seed=REGION_SEED[ch];
+        const dist=seed?Math.max(Math.abs(ri-seed.row),Math.abs(ci-seed.col)):0;
+        if(ch===startReg&&spawnRow!=null&&dist===0){
+          html+=`<span class="cx" title="${REGION[ch]?.name} — STARTING ZONE"></span>`;
+        } else if(dist<=regionCoverageRadius(ch)){
+          html+=`<span class="co" title="${REGION[ch]?.name}"></span>`;
+        } else {
+          html+=`<span class="cu" title="${REGION[ch]?.name}"></span>`;
+        }
         ci++;continue;
       }
-      if(GS.regions.includes(ch)){html+=`<span class="co" title="${REGION[ch]?.name}"></span>`;ci++;continue}
       if(REGION[ch]?.boat){html+=`<span class="ci" title="${REGION[ch]?.name}"></span>`;ci++;continue}
       html+=`<span class="cu" title="${REGION[ch]?.name}"></span>`;ci++;
     }
@@ -1743,6 +1875,7 @@ function checkDensity(){
         // Lose the region
         GS.regions=GS.regions.filter(x=>x!==r);
         delete GS.fadingRegions[r];
+        delete GS.regionEntry[r]; // re-settling this region later starts its coverage fresh
         GS.territory=calcTerritory();
         showDensityMsg(`⚠ Low population density: ${REGION[r]?.name} has been abandoned.`);
         break;
@@ -1796,6 +1929,13 @@ function continueTurnFlow(){
     setTimeout(()=>openRunner(),400);
     return;
   }
+  // Check hail mary — one final all-or-nothing leap, late game only. Uses >=
+  // so it can't be skipped if another special event claimed the exact turn.
+  if(GS.turn>=GS.hailMarySeason&&!GS.hailMaryDone){
+    GS.hailMaryDone=true;
+    setTimeout(()=>openHailMarySetup(),400);
+    return;
+  }
   const end=checkEnd();
   if(end){showEnd(end);return}
   const ev=pickEvent();
@@ -1820,6 +1960,7 @@ function pickExpansion(regionId){
   document.getElementById('expand-overlay').classList.remove('open');
   if(regionId){
     GS.regions.push(regionId);
+    GS.regionEntry[regionId]={turn:GS.turn,pop:GS.pop}; // foothold size scales with the population that moved in
     delete GS.fadingRegions[regionId];
     GS.territory=calcTerritory();
     drawMap();updateHUD();
@@ -1841,6 +1982,8 @@ function pickEvent(){
   const eligible=EVENTS.filter(e=>{
     if(!e.cyclic&&GS.usedEvents.has(e.id))return false;
     if(e.maxPop!=null&&GS.pop>e.maxPop)return false; // e.g. genetic drift only matters in small populations
+    if(e.minSeason!=null&&t<e.minSeason)return false; // major escalations shouldn't fire the instant their phase begins
+    if(e.requires!=null&&!GS.usedEvents.has(e.requires))return false; // narrative ordering (e.g. RHDV after myxomatosis)
     if(e.phase==='any')return true;
     if(e.phase===phase)return true;
     if(phase==='mid'&&e.phase==='early'&&t<=14)return true;
@@ -1957,7 +2100,9 @@ function applyChoice(idx,doLog){
   if(fx.statDeltas)Object.entries(fx.statDeltas).forEach(([k,v])=>adjStat(k,v));
   if(fx.terrBonus)GS.territory=parseFloat(Math.min(100,GS.territory+fx.terrBonus).toFixed(2));
   if(fx.unlockRegion&&!GS.regions.includes(fx.unlockRegion)){
-    GS.regions.push(fx.unlockRegion);GS.territory=calcTerritory();
+    GS.regions.push(fx.unlockRegion);
+    GS.regionEntry[fx.unlockRegion]={turn:GS.turn,pop:GS.pop};
+    GS.territory=calcTerritory();
   }
   // Named champion — first time a selected trait crosses "exceptional" (7/10)
   if(selInfo){
@@ -2245,6 +2390,257 @@ function timingContinue(){
 }
 
 // ═══════════════════════════════════════════════════════
+//  HAIL MARY: THE GREAT LEAP (one-time, late game)
+// ═══════════════════════════════════════════════════════
+// Final all-or-nothing event. Player commits a share of the population, then
+// plays a one-press vertical jump gauntlet: land on side-to-side moving
+// platforms, 5 in a row to clear each of 4 increasingly hard levels. Reward
+// scales with LEVELS fully cleared (0-4) — top tiers surge both population
+// (on the committed share only) and territory.
+const HM_OUTCOMES=[
+  {lv:4,popMult:6.0, label:'TOTAL TRIUMPH',       claim:true, boostTurns:12},
+  {lv:3,popMult:3.0, label:'MAJOR SUCCESS',       claim:true, boostTurns:6},
+  {lv:2,popMult:1.5, label:'PARTIAL SUCCESS',     claim:false,boostTurns:3},
+  {lv:1,popMult:0.9, label:'A FEW GOT THROUGH',   claim:false,boostTurns:0},
+  {lv:0,popMult:0.3, label:'CATASTROPHIC FAILURE',claim:false,boostTurns:0},
+];
+function hmOutcomeForLevels(lv){return HM_OUTCOMES.find(o=>lv>=o.lv)||HM_OUTCOMES[HM_OUTCOMES.length-1];}
+
+function openHailMarySetup(){
+  sndDramatic();
+  const pop=GS.pop;
+  const maxC=Math.max(1,Math.floor(pop*0.7));
+  const initC=Math.max(1,Math.floor(maxC*0.4));
+  GS.hailMaryCommit=initC;
+  document.getElementById('hm-pop').textContent=fmtPop(pop);
+  const sl=document.getElementById('hm-slider');
+  sl.max=maxC; sl.value=initC;
+  document.getElementById('hm-amt').textContent=fmtPop(initC);
+  buildHailMaryTable(initC);
+  document.getElementById('hailmary-setup-overlay').classList.add('open');
+}
+function onHailMarySlider(){
+  const v=+document.getElementById('hm-slider').value;
+  GS.hailMaryCommit=v;
+  document.getElementById('hm-amt').textContent=fmtPop(v);
+  buildHailMaryTable(v);
+}
+function buildHailMaryTable(amt){
+  document.getElementById('hm-tbl').innerHTML=HM_OUTCOMES.map(o=>{
+    const after=Math.round(amt*o.popMult);
+    const change=after-amt;
+    const cls=change>0?'pos':change<0?'neg':'neu';
+    const sign=change>=0?'+':'';
+    return`<tr><td class="gs">${o.lv}/4</td><td class="gd">${o.label}${o.claim?' + territory surge':''}</td><td class="gv ${cls}">${sign}${fmtPop(Math.abs(change))}</td></tr>`;
+  }).join('');
+}
+function startHailMary(){
+  document.getElementById('hailmary-setup-overlay').classList.remove('open');
+  document.getElementById('hailmary-game-overlay').classList.add('open');
+  hmjStart();
+}
+
+// ── The jump gauntlet ──
+const HMJ_LEVELS=[
+  {w:110,s:1.6,d: 1},
+  {w:85, s:2.3,d:-1},
+  {w:62, s:3.2,d: 1},
+  {w:42, s:4.3,d:-1},
+];
+const HMJ_JUMPS_PER_LEVEL=5, HMJ_JUMP_MS=700, HMJ_ARC=60;
+const HMJ_CW=380, HMJ_CH=520, HMJ_GROUND_Y=480, HMJ_SPACING=180, HMJ_DISPLAY_Y=400, HMJ_PLAT_H=14;
+const HMJ_RPW=4, HMJ_RPH=4, HMJ_RW=6*HMJ_RPW; // sprite height computed lazily — FR_SPR is declared later in the file, so referencing it here at top level would TDZ-throw and abort the whole script
+let HMJ=null;
+
+function hmjTierWorldY(tier){return HMJ_GROUND_Y - tier*HMJ_SPACING}
+function hmjLevelConfig(tier){return HMJ_LEVELS[Math.min(HMJ_LEVELS.length-1,Math.floor((tier-1)/HMJ_JUMPS_PER_LEVEL))]}
+function hmjLevelNum(tier){return Math.min(HMJ_LEVELS.length,Math.floor((tier-1)/HMJ_JUMPS_PER_LEVEL)+1)}
+function hmjStreak(tier){return((tier-1)%HMJ_JUMPS_PER_LEVEL)+1}
+function hmjPlatX(tier){return HMJ.platformX[tier]}
+function hmjLerp(a,b,t){return a+(b-a)*t}
+
+function hmjStart(){
+  const total=HMJ_LEVELS.length*HMJ_JUMPS_PER_LEVEL;
+  const platformX=new Array(total+1).fill(0),platformDir=new Array(total+1).fill(0);
+  for(let k=1;k<=total;k++){
+    const cfg=hmjLevelConfig(k),half=cfg.w/2;
+    platformX[k]=half+Math.random()*(HMJ_CW-2*half);
+    platformDir[k]=cfg.d;
+  }
+  HMJ={active:true,jumping:false,falling:false,over:false,won:false,hits:0,targetTier:1,total,
+       rabbitX:HMJ_CW/2,rabbitWorldY:hmjTierWorldY(0),cameraY:0,rideOffset:0,platformX,platformDir,levelsCleared:0};
+  document.getElementById('hmj-level').textContent='1';
+  document.getElementById('hmj-streak').textContent='0';
+  document.getElementById('hmj-jpl').textContent=HMJ_JUMPS_PER_LEVEL;
+  document.getElementById('hmj-committed').textContent=fmtPop(GS.hailMaryCommit)+' committed';
+  document.getElementById('hmj-status').textContent='Press SPACE or tap to jump onto the moving ground';
+  document.getElementById('hmj-cont-btn').style.display='none';
+  window.addEventListener('keydown',hmjKey);
+  const cvs=document.getElementById('hmj-canvas');
+  cvs.addEventListener('mousedown',hmjDoJump);
+  cvs.addEventListener('touchstart',hmjTouch,{passive:false});
+  requestAnimationFrame(hmjLoop);
+}
+function hmjKey(e){if(e.code==='Space'||e.key===' '){e.preventDefault();hmjDoJump();}}
+function hmjTouch(e){e.preventDefault();hmjDoJump();}
+
+function hmjDoJump(){
+  if(!HMJ||!HMJ.active||HMJ.jumping||HMJ.falling||HMJ.over)return;
+  HMJ.jumping=true;
+  HMJ.jumpStart=performance.now();
+  HMJ.jumpX=HMJ.rabbitX; // freeze wherever the platform carried you to — that's the launch/landing X
+  HMJ.jumpFromY=hmjTierWorldY(HMJ.targetTier-1);
+  HMJ.jumpToY=hmjTierWorldY(HMJ.targetTier);
+  HMJ.jumpFromCam=HMJ.cameraY;
+  HMJ.jumpToCam=HMJ_DISPLAY_Y-HMJ.jumpToY;
+  sndJump();
+  document.getElementById('hmj-status').textContent='...';
+}
+function hmjLandCheck(){
+  const plat=hmjPlatX(HMJ.targetTier);
+  const half=hmjLevelConfig(HMJ.targetTier).w/2;
+  return Math.abs(HMJ.jumpX-plat)<=half;
+}
+function hmjStartFall(){
+  HMJ.jumping=false;HMJ.falling=true;
+  HMJ.fallStart=performance.now();HMJ.fallFromY=HMJ.rabbitWorldY;
+  sndTimingFail();
+  document.getElementById('hmj-status').textContent='MISSED!';
+}
+function hmjUpdatePlatforms(){
+  for(let k=1;k<=HMJ.total;k++){
+    const cfg=hmjLevelConfig(k),half=cfg.w/2;
+    let x=HMJ.platformX[k]+cfg.s*HMJ.platformDir[k];
+    if(x<half){x=half;HMJ.platformDir[k]=1;}
+    if(x>HMJ_CW-half){x=HMJ_CW-half;HMJ.platformDir[k]=-1;}
+    HMJ.platformX[k]=x;
+  }
+}
+function hmjLoop(ts){
+  if(!HMJ)return;
+  hmjUpdatePlatforms();
+  if(HMJ.jumping){
+    const t=Math.min(1,(ts-HMJ.jumpStart)/HMJ_JUMP_MS);
+    HMJ.rabbitWorldY=hmjLerp(HMJ.jumpFromY,HMJ.jumpToY,t)-HMJ_ARC*Math.sin(t*Math.PI);
+    HMJ.cameraY=hmjLerp(HMJ.jumpFromCam,HMJ.jumpToCam,t);
+    HMJ.rabbitX=HMJ.jumpX; // airborne — X unaffected by any platform
+    if(t>=1){
+      HMJ.jumping=false;HMJ.rabbitWorldY=HMJ.jumpToY;HMJ.cameraY=HMJ.jumpToCam;
+      if(hmjLandCheck()){
+        HMJ.rideOffset=HMJ.jumpX-hmjPlatX(HMJ.targetTier); // keep riding from where you landed
+        HMJ.hits=HMJ.targetTier;
+        sndTimingSuccess();
+        if(HMJ.targetTier>=HMJ.total){HMJ.won=true;hmjEnd();}
+        else{
+          HMJ.targetTier++;
+          document.getElementById('hmj-level').textContent=hmjLevelNum(HMJ.targetTier);
+          document.getElementById('hmj-streak').textContent=hmjStreak(HMJ.targetTier)-1;
+          document.getElementById('hmj-status').textContent='Landed! Jump again';
+        }
+      } else hmjStartFall();
+    }
+  } else if(HMJ.falling){
+    const fe=(ts-HMJ.fallStart)/1000;
+    HMJ.rabbitWorldY=HMJ.fallFromY+0.5*1400*fe*fe;
+    if(HMJ.rabbitWorldY+HMJ.cameraY>HMJ_CH+80){HMJ.falling=false;hmjEnd();}
+  } else if(HMJ.active){
+    const st=HMJ.targetTier-1; // standing — ride the platform (ground at tier 0 doesn't sweep)
+    HMJ.rabbitX=st===0?HMJ_CW/2:hmjPlatX(st)+HMJ.rideOffset;
+  }
+  hmjDraw();
+  if(HMJ.active||HMJ.falling)requestAnimationFrame(hmjLoop);
+}
+function hmjDraw(){
+  const ctx=document.getElementById('hmj-canvas').getContext('2d');
+  ctx.fillStyle='#000';ctx.fillRect(0,0,HMJ_CW,HMJ_CH);
+  hmjDrawPlat(ctx,0,hmjTierWorldY(0)+HMJ.cameraY,HMJ_CW,'#1a4a1a',true);
+  for(let k=1;k<=HMJ.total;k++){
+    const sy=hmjTierWorldY(k)+HMJ.cameraY;
+    if(sy<-HMJ_PLAT_H||sy>HMJ_CH+HMJ_PLAT_H)continue;
+    const cfg=hmjLevelConfig(k);
+    const cleared=k<HMJ.targetTier||(k===HMJ.targetTier&&HMJ.hits>=k);
+    const col=cleared?'#33ff33':(k===HMJ.targetTier?'#ffff33':'#1a4a1a');
+    hmjDrawPlat(ctx,HMJ.platformX[k]-cfg.w/2,sy,cfg.w,col,false);
+  }
+  const rsy=HMJ.rabbitWorldY+HMJ.cameraY-FR_SPR.length*HMJ_RPH;
+  hmjDrawRabbit(ctx,HMJ.rabbitX-HMJ_RW/2,rsy,HMJ.falling?'#ff3333':'#33ff33');
+}
+function hmjDrawPlat(ctx,x,y,w,color,isGround){
+  ctx.fillStyle=color;ctx.fillRect(x,y,w,HMJ_PLAT_H);
+  if(!isGround){ctx.fillStyle='#000';ctx.fillRect(x+1,y+1,w-2,HMJ_PLAT_H-4);ctx.fillStyle=color;}
+}
+function hmjDrawRabbit(ctx,px,py,color){
+  ctx.fillStyle=color;
+  FR_SPR.forEach((row,r)=>[...row].forEach((ch,c)=>{
+    if(ch==='#')ctx.fillRect(px+c*HMJ_RPW,py+r*HMJ_RPH,HMJ_RPW,HMJ_RPH);
+  }));
+}
+function hmjEnd(){
+  HMJ.active=false;HMJ.over=true;
+  window.removeEventListener('keydown',hmjKey);
+  const cvs=document.getElementById('hmj-canvas');
+  cvs.removeEventListener('mousedown',hmjDoJump);
+  cvs.removeEventListener('touchstart',hmjTouch);
+  HMJ.levelsCleared=Math.floor(HMJ.hits/HMJ_JUMPS_PER_LEVEL);
+  GS.hailMaryLevels=HMJ.levelsCleared;
+  document.getElementById('hmj-status').textContent=
+    HMJ.won?'ALL LEVELS CLEARED!':`FELL — ${HMJ.levelsCleared} of 4 levels cleared`;
+  document.getElementById('hmj-cont-btn').style.display='inline-block';
+}
+
+function resolveHailMary(){
+  document.getElementById('hailmary-game-overlay').classList.remove('open');
+  const levelsCleared=GS.hailMaryLevels||0;
+  const outcome=hmOutcomeForLevels(levelsCleared);
+  const prePop=GS.pop;
+  const commit=GS.hailMaryCommit;
+  const uncommitted=prePop-commit;
+  const commitAfter=Math.max(0,Math.round(commit*outcome.popMult));
+  GS.pop=Math.max(5,uncommitted+commitAfter);
+  const claimedNames=[];
+  if(outcome.claim){
+    getExpansionCandidates().forEach(r=>{
+      if(!GS.regions.includes(r)){
+        GS.regions.push(r);
+        GS.regionEntry[r]={turn:GS.turn,pop:GS.pop};
+        claimedNames.push(REGION[r]?.name||r);
+      }
+    });
+  }
+  if(outcome.boostTurns>0){
+    GS.regions.forEach(r=>{
+      const e=GS.regionEntry[r];
+      if(e)e.turn=Math.max(0,e.turn-outcome.boostTurns);
+      else GS.regionEntry[r]={turn:Math.max(0,GS.turn-outcome.boostTurns),pop:GS.pop};
+      GS.regionEntry[r].pop=GS.pop;
+    });
+  }
+  GS.territory=calcTerritory();
+  GS.log.push({season:GS.turn,event:'THE GREAT LEAP',choice:`${levelsCleared}/4 levels cleared — ${outcome.label}`});
+  drawMap();updateHUD();animateStatSidebar();
+  showHailMaryResults(outcome,prePop,claimedNames,levelsCleared);
+}
+function showHailMaryResults(outcome,prePop,claimedNames,levelsCleared){
+  const delta=GS.pop-prePop;
+  const titleEl=document.getElementById('hmres-title');
+  titleEl.textContent=outcome.label;
+  titleEl.style.color=outcome.popMult>=2?'#33ff33':outcome.popMult<1?'#ff3333':'#ffaa00';
+  document.getElementById('hmres-sub').textContent=`${levelsCleared} of 4 levels cleared`;
+  let body=`<span class="${delta>=0?'pos':'neg'}">POPULATION ${delta>=0?'+':'-'}${fmtPop(Math.abs(delta))} (now ${fmtPop(GS.pop)})</span><br>`;
+  if(claimedNames.length)body+=`<span class="pos">NEW TERRITORY CLAIMED: ${claimedNames.join(', ')}</span><br>`;
+  body+=`TERRITORY: ${GS.territory.toFixed(1)}%`;
+  document.getElementById('hmres-body').innerHTML=body;
+  if(levelsCleared>=4){sndVictory();}else if(outcome.popMult>=1){sndPositive();}else{sndNegative();}
+  document.getElementById('hailmary-result-overlay').classList.add('open');
+}
+function closeHailMaryResults(){
+  document.getElementById('hailmary-result-overlay').classList.remove('open');
+  // The leap WAS this turn's event (like the river gamble) — advance to the
+  // next season rather than also showing a regular event on the same turn.
+  nextTurn();
+}
+
+// ═══════════════════════════════════════════════════════
 //  END SCREEN
 // ═══════════════════════════════════════════════════════
 const END={
@@ -2449,6 +2845,9 @@ function dismissOutcome(){
 function openMCQ(mcq){
   GS.currentMCQ=mcq;
   document.getElementById('mcq-topic').textContent=mcq.topic;
+  const defEl=document.getElementById('mcq-def');
+  if(mcq.def){defEl.textContent=mcq.def;defEl.style.display='block';}
+  else{defEl.style.display='none';}
   document.getElementById('mcq-q').textContent=mcq.q;
   document.getElementById('mcq-result').textContent='';
   document.getElementById('mcq-cont').style.display='none';
