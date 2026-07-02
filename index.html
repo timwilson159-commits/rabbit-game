@@ -10,16 +10,18 @@ body{background:#0a0a0a;color:#33ff33;font-family:'Courier New',monospace;min-he
 #gc{width:100%;max-width:1200px}
 .screen{display:none}.screen.active{display:block}
 
-/* ── TWO-COLUMN GAME LAYOUT ── */
+/* ── GAME LAYOUT ── */
 #game-cols{display:flex;gap:10px;align-items:flex-start}
 #game-left{flex:1;min-width:0}
-#game-right{width:240px;flex-shrink:0;border:1px solid #33ff33;padding:10px}
+.hud-col{flex:1;min-width:200px;display:flex;flex-direction:column;gap:7px}
+.genetics-panel{border:1px solid #33ff33;padding:10px}
 .sbar-title{font-size:11px;letter-spacing:2px;color:#88ff88;margin-bottom:8px;text-align:center}
 .sbar-row{display:flex;align-items:center;gap:5px;margin:4px 0}
 .sbar-name{font-size:10px;color:#88ff88;width:110px;flex-shrink:0}
 .sbar-track{flex:1;height:9px;background:#050f05;border:1px solid #1a4a1a}
 .sbar-fill{height:100%;transition:width 0.6s ease}
 .sbar-val{font-size:10px;color:#fff;width:24px;text-align:right}
+#stats-sidebar svg{margin:0 2px}
 
 /* ── HUD ── */
 .hud{border:1px solid #33ff33;padding:7px 9px;margin-bottom:7px;font-size:11px}
@@ -31,15 +33,22 @@ body{background:#0a0a0a;color:#33ff33;font-family:'Courier New',monospace;min-he
 .bfill.pop{background:#33ff33}
 .bfill.terr{background:#00aaff}
 .bfill.seas{background:#ffaa00}
+.bfill.impact{background:#8866ff}
+.bfill.impact.warn{background:#ff6600}
+.bfill.impact.crit{background:#ff2266}
 .bfill.warn{background:#ff6600}
 .bfill.crit{background:#ff2200}
 .bval{width:64px;text-align:right;font-size:11px;color:#fff}
 
+/* ── MAP + HUD ROW ── */
+.map-hud-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:7px}
+.map-hud-row .hud{flex:1;min-width:200px;margin-bottom:0}
+.map-hud-row .map-wrap{flex-shrink:0;margin-bottom:0}
 /* ── MAP ── */
 .map-wrap{border:1px solid #33ff33;padding:7px 9px;margin-bottom:7px}
 .map-hdr{text-align:center;font-size:10px;letter-spacing:2px;color:#88ff88;margin-bottom:4px}
 #map-grid{line-height:0;font-size:0}
-#map-grid span{display:inline-block;width:13px;height:13px;vertical-align:top}
+#map-grid span{display:inline-block;width:10px;height:10px;vertical-align:top}
 #map-grid br{display:block;height:0;line-height:0}
 .cs{background:#030a03}/* sea */
 .co{background:#0a1a0a;background-image:repeating-linear-gradient(45deg,#33ff33 0,#33ff33 1px,transparent 1px,transparent 5px),repeating-linear-gradient(-45deg,#33ff33 0,#33ff33 1px,transparent 1px,transparent 5px)}/* occupied crosshatch */
@@ -47,18 +56,21 @@ body{background:#0a0a0a;color:#33ff33;font-family:'Courier New',monospace;min-he
 .ci{background:#000;border:1px solid #223322}/* island locked */
 .cx{background:#ffff00;border:1px solid #ffff00}/* starting */
 .cf{background:#333300;border:1px solid #666600}/* fading (density warning) */
-.map-legend{font-size:9px;color:#334433;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+.map-legend{font-size:9px;color:#88ff88;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
 .map-legend span{display:flex;align-items:center;gap:3px}
 .lsq{display:inline-block;width:9px;height:9px}
 
 /* ── EVENT PANEL ── */
 .ev-panel{border:1px solid #33ff33;padding:10px 12px;margin-bottom:7px}
+.ev-cols{display:flex;gap:12px;align-items:flex-start}
+.ev-text-col{flex:1;min-width:0}
+.ev-img-col{width:42%;flex-shrink:0}
 .ev-cat{font-size:9px;letter-spacing:3px;color:#88ff88;margin-bottom:2px}
 .ev-title{font-size:18px;letter-spacing:2px;color:#fff;text-shadow:0 0 8px #33ff33;margin-bottom:8px}
 .ev-body{font-size:12px;line-height:1.65;color:#ccffcc;margin-bottom:10px}
 /* sprite container */
-.ev-sprite{margin-bottom:10px;text-align:center;background:#000;border:1px solid #1a4a1a;padding:4px}
-.ev-sprite svg{display:block;margin:0 auto;max-height:150px}
+.ev-sprite{text-align:center;background:#000;border:1px solid #1a4a1a;padding:4px}
+.ev-sprite svg{display:block;margin:0 auto;max-height:200px;width:100%}
 .sprite-caption{font-size:11px;color:#33ff33;border:1px solid #33ff33;display:inline-block;padding:2px 8px;margin-top:4px;font-family:'Courier New',monospace}
 /* scene overlay (dramatic events) */
 #scene-overlay{display:none;position:fixed;inset:0;background:#000;z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:20px}
@@ -78,6 +90,8 @@ body{background:#0a0a0a;color:#33ff33;font-family:'Courier New',monospace;min-he
 .cbtn:disabled{opacity:.3;cursor:default}
 .cbtn-cont{border-color:#88ff88;color:#88ff88;margin-top:3px}
 .cbtn-cont:hover:not(:disabled){background:#050f05}
+.cbtn-risky{border-color:#ffff33;color:#ffff33}
+.cbtn-risky:hover:not(:disabled){background:#1e1e00;border-color:#fff;color:#fff}
 
 /* ── EVOLUTION RUNNER OVERLAY ── */
 #runner-overlay{display:none;position:fixed;inset:0;background:#000;z-index:400;flex-direction:column;align-items:center;justify-content:center}
@@ -150,6 +164,7 @@ body{background:#0a0a0a;color:#33ff33;font-family:'Courier New',monospace;min-he
 .end-sub{text-align:center;font-size:12px;color:#88ff88;margin-bottom:12px}
 .score-box{border:2px solid #ffff33;padding:10px;text-align:center;margin-bottom:12px}
 .score-num{font-size:36px;color:#ffff33;text-shadow:0 0 12px #ffff33;letter-spacing:3px}
+.score-rank{font-size:16px;color:#ffff33;letter-spacing:2px;text-shadow:0 0 8px #ffaa00;margin-top:2px}
 .score-lbl{font-size:10px;color:#aaaa33;letter-spacing:2px;margin-top:2px}
 .sum-box{border:1px solid #33ff33;padding:9px 11px;margin-bottom:9px}
 .sum-row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;border-bottom:1px solid #050f05;color:#ccffcc}
@@ -169,6 +184,11 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 
 /* ── RIVER CROSSING GAMBLE ── */
 #gamble-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#expand-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#expand-overlay.open{display:flex}
+#expand-opts .opt{max-width:440px}
+#mcq-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#mcq-overlay.open{display:flex}
 #gamble-overlay.open{display:flex}
 .gamble-panel{border:2px solid #33ff33;background:#030a03;padding:22px 26px;max-width:480px;width:90%}
 .gamble-title{font-size:14px;letter-spacing:3px;color:#fff;text-shadow:0 0 10px #33ff33;text-align:center;margin-bottom:4px}
@@ -200,7 +220,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 #frog-hint{font-size:10px;color:#334433;margin-top:5px;letter-spacing:1px;text-align:center}
 
 /* ── FULLSCREEN BUTTON ── */
-#fs-btn{position:fixed;top:8px;right:8px;z-index:10000;background:transparent;border:1px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:10px;padding:3px 8px;cursor:pointer;letter-spacing:1px}
+#fs-btn{width:100%;background:transparent;border:1px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:10px;padding:5px 8px;cursor:pointer;letter-spacing:1px}
 #fs-btn:hover{background:#33ff33;color:#000}
 
 /* ── OUTCOME OVERLAY ── */
@@ -245,7 +265,7 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
 <!-- SETUP -->
 <div id="screen-setup" class="screen">
 <div class="setup-wrap">
-<div class="step-ind">SETUP — STEP <span id="step-num">1</span> OF 4</div>
+<div class="step-ind">SETUP — STEP <span id="step-num">1</span> OF 5</div>
 <div id="step-1" class="setup-step active">
   <div class="sq-title">ARRIVAL POINT</div>
   <div class="sq-q">Where will your rabbits first be released?</div>
@@ -266,7 +286,15 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
   <div class="sq-q">Choose 2 traits your population excels at:</div>
   <div id="boost-opts"></div>
   <div id="boost-lbl">SELECTED: 0 / 2</div>
-  <button id="boost-go" onclick="confirmBoosts()">CONFIRM &amp; BEGIN ›</button>
+  <button id="boost-go" onclick="confirmBoosts()">CONTINUE ›</button>
+</div>
+<div id="step-5" class="setup-step">
+  <div class="sq-title">NAME YOUR LINEAGE</div>
+  <div class="sq-q">What will history call your rabbits?</div>
+  <div class="opt-d" style="margin-bottom:10px">Optional — leave blank for a default name. This appears in your event log and final debrief.</div>
+  <input id="lineage-input" type="text" maxlength="32" placeholder="e.g. The Austin Line"
+    style="width:100%;background:#050f05;border:1px solid #33ff33;color:#fff;font-family:'Courier New',monospace;font-size:14px;padding:9px 12px;margin-bottom:12px">
+  <button class="big-btn" onclick="confirmLineage()">[ BEGIN ]</button>
 </div>
 </div>
 </div>
@@ -275,47 +303,61 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
 <div id="screen-game" class="screen">
 <div id="game-cols">
   <div id="game-left">
-    <!-- HUD -->
-    <div class="hud">
-      <div class="hud-hdr">
-        <span>RABBIT REPUBLIC</span>
-        <span id="hud-lbl">SEASON 1 OF 30</span>
+    <!-- MAP + HUD+GENETICS SIDE BY SIDE -->
+    <div class="map-hud-row">
+      <!-- MAP -->
+      <div class="map-wrap">
+        <div class="map-hdr">[ AUSTRALIA — OCCUPIED TERRITORY ]</div>
+        <div id="map-grid"></div>
+        <div class="map-legend">
+          <span><span class="lsq co"></span> Occupied</span>
+          <span><span class="lsq cu" style="border:1px solid #1a3a1a"></span> Unoccupied</span>
+          <span><span class="lsq cx"></span> Starting zone</span>
+          <span><span class="lsq cf"></span> Fading</span>
+          <span><span class="lsq ci" style="border:1px solid #223322"></span> Island</span>
+        </div>
       </div>
-      <div class="brow"><span class="blbl">POPULATION:</span><div class="btrack"><div class="bfill pop" id="b-pop" style="width:0%"></div></div><span class="bval" id="v-pop">0</span></div>
-      <div class="brow"><span class="blbl">TERRITORY:</span><div class="btrack"><div class="bfill terr" id="b-terr" style="width:0%"></div></div><span class="bval" id="v-terr">0.0%</span></div>
-      <div class="brow"><span class="blbl">SEASONS LEFT:</span><div class="btrack"><div class="bfill seas" id="b-seas" style="width:100%"></div></div><span class="bval" id="v-seas">30</span></div>
-    </div>
-    <!-- MAP -->
-    <div class="map-wrap">
-      <div class="map-hdr">[ AUSTRALIA — OCCUPIED TERRITORY ]</div>
-      <div id="map-grid"></div>
-      <div class="map-legend">
-        <span><span class="lsq co"></span> Occupied</span>
-        <span><span class="lsq cu" style="border:1px solid #1a3a1a"></span> Unoccupied</span>
-        <span><span class="lsq cx"></span> Starting zone</span>
-        <span><span class="lsq cf"></span> Fading (low density)</span>
-        <span><span class="lsq ci" style="border:1px solid #223322"></span> Island (unreached)</span>
+      <!-- RIGHT COLUMN: HUD + GENETICS -->
+      <div class="hud-col">
+        <button id="fs-btn" onclick="toggleFS()">⛶ FULLSCREEN</button>
+        <div class="hud">
+          <div class="hud-hdr">
+            <span id="hud-lineage">RABBIT REPUBLIC</span>
+            <span id="hud-lbl">SEASON 1 OF 30</span>
+          </div>
+          <div class="brow"><span class="blbl">POPULATION:</span><div class="btrack"><div class="bfill pop" id="b-pop" style="width:0%"></div></div><span class="bval" id="v-pop">0</span></div>
+          <div class="brow"><span class="blbl">TERRITORY:</span><div class="btrack"><div class="bfill terr" id="b-terr" style="width:0%"></div></div><span class="bval" id="v-terr">0.0%</span></div>
+          <div class="brow"><span class="blbl">SEASONS LEFT:</span><div class="btrack"><div class="bfill seas" id="b-seas" style="width:100%"></div></div><span class="bval" id="v-seas">30</span></div>
+          <div class="brow"><span class="blbl">NATIVE IMPACT:</span><div class="btrack"><div class="bfill impact" id="b-impact" style="width:0%"></div></div><span class="bval" id="v-impact">0%</span></div>
+          <div id="native-list" style="font-size:9px;color:#88aaff;margin-top:3px;line-height:1.6"></div>
+        </div>
+        <div class="genetics-panel">
+          <div class="sbar-title">POPULATION GENETICS</div>
+          <div id="stats-sidebar"></div>
+          <div style="margin-top:8px;padding-top:6px;border-top:1px solid #1a4a1a;font-size:10px;color:#334433;text-align:center">
+            1 = weak · 10 = exceptional &nbsp;
+            <span style="color:#33ff33">■</span> high &nbsp;<span style="color:#ffaa00">■</span> mid &nbsp;<span style="color:#ff4422">■</span> low
+          </div>
+          <div id="density-warn" style="display:none;margin-top:8px;padding:6px;border:1px solid #ff6600;font-size:10px;color:#ff9900;line-height:1.5"></div>
+          <div id="island-warn" style="display:none;margin-top:8px;padding:6px;border:1px solid #00aaff;font-size:10px;color:#66ccff;line-height:1.5"></div>
+        </div>
       </div>
     </div>
     <!-- EVENT -->
     <div class="ev-panel">
-      <div class="ev-cat" id="ev-cat">LOADING...</div>
-      <div class="ev-title" id="ev-title"></div>
-      <div class="ev-body" id="ev-body"></div>
-      <div class="ev-sprite" id="ev-sprite"></div>
-      <div class="out-box" id="out-box"></div>
-      <div class="choices" id="choices"></div>
+      <div class="ev-cols">
+        <div class="ev-text-col">
+          <div class="ev-cat" id="ev-cat">LOADING...</div>
+          <div class="ev-title" id="ev-title"></div>
+          <div class="ev-body" id="ev-body"></div>
+          <div class="out-box" id="out-box"></div>
+          <div class="choices" id="choices"></div>
+        </div>
+        <div class="ev-img-col">
+          <div class="ev-sprite" id="ev-sprite"></div>
+        </div>
+      </div>
     </div>
-  </div>
-  <!-- STATS SIDEBAR -->
-  <div id="game-right">
-    <div class="sbar-title">POPULATION GENETICS</div>
-    <div id="stats-sidebar"></div>
-    <div style="margin-top:10px;padding-top:8px;border-top:1px solid #1a4a1a;font-size:10px;color:#334433;text-align:center">
-      1 = weak · 10 = exceptional<br>
-      <span style="color:#33ff33">■</span> high &nbsp;<span style="color:#ffaa00">■</span> mid &nbsp;<span style="color:#ff4422">■</span> low
-    </div>
-    <div id="density-warn" style="display:none;margin-top:8px;padding:6px;border:1px solid #ff6600;font-size:10px;color:#ff9900;line-height:1.5"></div>
   </div>
 </div>
 </div>
@@ -327,14 +369,20 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
   <div class="end-sub" id="end-sub"></div>
   <div class="score-box">
     <div class="score-num" id="score-num">0</div>
+    <div class="score-rank" id="score-rank"></div>
     <div class="score-lbl">FINAL SCORE / 100</div>
     <div id="score-breakdown" style="font-size:10px;color:#888833;margin-top:3px"></div>
   </div>
   <div id="graph-wrap"><svg id="end-graph" viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg"></svg></div>
   <div class="sum-box" id="sum-box"></div>
+  <div id="champions-wrap" style="display:none">
+    <div style="font-size:11px;color:#ffcc44;margin-bottom:4px;letter-spacing:1px">NOTABLE INDIVIDUALS:</div>
+    <div class="dec-log" id="champions-log" style="border-color:#ffcc44"></div>
+  </div>
   <div style="font-size:11px;color:#88ff88;margin-bottom:4px;letter-spacing:1px">KEY DECISIONS:</div>
   <div class="dec-log" id="dec-log"></div>
   <div class="lesson-box" id="lesson-box"></div>
+  <div class="lesson-box" id="history-box" style="border-color:#ffaa00"></div>
   <div style="text-align:center"><button class="big-btn" onclick="restart()">[ PLAY AGAIN ]</button></div>
 </div>
 </div>
@@ -358,9 +406,31 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
     <div id="runner-pts-fill" style="width:10%"></div>
     <div id="runner-pts-label">1 POINT</div>
   </div>
-  <div id="runner-hint">Milestones: 1pt → 2pts → 3pts ... → 10pts (max). Hit something = game over.</div>
+  <div id="runner-hint">1 point awarded automatically. +1 point per 2 levels survived. Max 6 points. Hit something = game over.</div>
   <div id="runner-gameover" style="display:none;font-size:16px;color:#ff5522;margin-top:8px;text-align:center"></div>
   <button id="runner-go" style="display:none;background:transparent;border:1px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;padding:8px 20px;cursor:pointer;margin-top:8px" onclick="openAllocFromRunner()">[ SPEND YOUR POINTS → ]</button>
+</div>
+
+<!-- EXPANSION CHOICE OVERLAY -->
+<div id="expand-overlay">
+  <div class="gamble-panel">
+    <div class="gamble-title">EXPANSION OPPORTUNITY</div>
+    <div class="gamble-sub">YOUR POPULATION IS READY TO SPREAD — CHOOSE A DIRECTION</div>
+    <div id="expand-opts"></div>
+    <button onclick="pickExpansion(null)" style="margin-top:10px;background:transparent;border:1px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:12px;padding:8px 16px;cursor:pointer;width:100%">[ HOLD — CONSOLIDATE THIS TERRITORY ]</button>
+  </div>
+</div>
+
+<!-- MCQ OVERLAY -->
+<div id="mcq-overlay">
+  <div class="gamble-panel" style="max-width:560px">
+    <div class="gamble-title">QUICK CHECK</div>
+    <div class="gamble-sub" id="mcq-topic"></div>
+    <div id="mcq-q" style="color:#fff;font-size:14px;margin:10px 0 14px;line-height:1.5"></div>
+    <div id="mcq-opts"></div>
+    <div id="mcq-result" style="font-size:12px;margin-top:10px;line-height:1.6"></div>
+    <button id="mcq-cont" style="display:none;margin:12px auto 0;background:transparent;border:2px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;padding:9px 22px;cursor:pointer" onclick="closeMCQ()">[ CONTINUE ]</button>
+  </div>
 </div>
 
 <!-- TIMING OVERLAY -->
@@ -431,9 +501,6 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
   <canvas id="frog-canvas" width="560" height="400"></canvas>
   <div id="frog-hint">↑ ↓ ← → — RIDE THE LOGS — LAND IN THE SLOTS — 3 LIVES</div>
 </div>
-
-<!-- FULLSCREEN BUTTON -->
-<button id="fs-btn" onclick="toggleFS()">⛶ FULLSCREEN</button>
 
 <!-- OUTCOME OVERLAY -->
 <div id="outcome-overlay" onclick="dismissOutcome()">
@@ -686,26 +753,34 @@ function spriteHTML(key, caption='', h=140) {
 //  DATA
 // ═══════════════════════════════════════════════════════
 
-// Australia map: 28 cols × 18 rows
+// Australia map: 28 cols × 20 rows
 const MAP_ROWS = [
-  "............................",
-  "............NNNNN...........",
-  ".......WWWWWNNNNNQQ.........",
-  "......WWWWWWNNNNNQQQQ.......",
-  "......WWWWWWWNNAAAQQQQ......",
-  "......WWWWWWWAAAABQQQQ......",
-  "......WWWWWWWAAAABBBQQ......",
-  ".....WWWWWWWWAAAAAABBBV.....",
-  ".....WWWWWWWAAAAAABBBVV.....",
-  ".....WWWWWWAAAAAABBBVVV.....",
-  "....WWWWWWAAAAAABBB.........",
-  "....WWWWWAAAAAAABB..........",
-  ".....WWWWAAAABB.............",
-  "......WWWAAABB.........L....",
-  ".......WWABB................",
-  "........WTTTTV..............",
-  ".........TTT................",
-  "..........T...............F.",
+  "....................N..............",
+  ".......WWWWW.......NN..............",
+  ".......WWWWWW......NNQ.............",
+  "......WWWWWWW......NNQQ............",
+  ".....WWWWWWWWNNNNNNNNQQQ...........",
+  "....WWWWWWWWWNNNNNNNNQQQ...........",
+  "....WWWWWWWWWNNNNNNNNQQQQ..........",
+  "...WWWWWWWWWWNNNNNNNNQQQQQ.......F.",
+  "..WWWWWWWWWWWNNNNNNNNQQQQQ.......F.",
+  ".WWWWWWWWWWWWNNNNNNNNQQQQQQ........",
+  "WWWWWWWWWWWWWNNNNNNNNQQQQQQ..LL....",
+  "WWWWWWWWWWWWWNNNNNNNNQQQQQQ..LL....",
+  "WWWWWWWWWWWWWNNNNNNNNQQQQQ...LL....",
+  ".WWWWWWWWWWWWNNNNNNNNQQQQQ.........",
+  "..WWWWWWWWWWWAAAAAAAAQQQQ..........",
+  "...WWWWWWWW.WAA.AAAAAQQQQ..........",
+  "....WWWWW....AA..AAAAQQQ...........",
+  ".....WWW..........AAAAA............",
+  "...................................",
+  "...................TTT.............",
+  "...................TTT.............",
+  "....................T..............",
+  "...................................",
+  "...................................",
+  "...................................",
+  "...................................."
 ];
 
 const REGION = {
@@ -719,29 +794,31 @@ const REGION = {
   L:{name:'Lord Howe Island',    km2:15,     diff:5, boat:true},
   F:{name:'Norfolk Island',      km2:35,     diff:5, boat:true},
 };
-const TOTAL_KM2 = Object.values(REGION).reduce((s,r)=>s+r.km2,0);
+// Only regions that actually appear on the map are reachable — so territory 100% = every reachable region occupied
+const MAP_REGION_IDS = [...new Set(MAP_ROWS.join('').split('').filter(c=>REGION[c]))];
+const TOTAL_KM2 = MAP_REGION_IDS.reduce((s,id)=>s+REGION[id].km2,0);
 // Density units (km2/5000) — determines how much population is needed per region
 function rUnits(id){return Math.max(1,Math.round((REGION[id]?.km2||0)/5000))}
 // Adjacency (mainland only; islands via special events)
-const ADJ={V:['A','B'],A:['V','W','N','B'],W:['A','N'],N:['W','A','Q'],Q:['N','A','B'],B:['Q','A','V']};
+const ADJ={W:['N','A'],N:['W','A','Q'],Q:['N','A'],A:['W','N','Q']};
 
 const LOCATIONS=[
-  {id:'VIC',region:'V',name:'Barwon Park, Victoria',
-   desc:'Temperate grasslands with reliable rainfall. The estate of Thomas Austin — where it began historically. Rich farmland nearby.',
-   pros:'Fertile land, mild climate, easy early food',cons:'Dense human settlement, foxes arrive early',
-   bonus:{foodFinding:2,litterSize:1}},
+  {id:'QLD',region:'Q',name:'Rockhampton, Queensland',
+   desc:'Subtropical grasslands on the eastern coast. Huge open country, warm climate, and rich grazing land make this the fastest-spreading starting point.',
+   pros:'Fast expansion corridors, warm climate year-round',cons:'Cyclone season, distance from SA and WA',
+   bonus:{litterSize:2,migrationSpeed:1},spawnRow:10,spawnCol:23},
   {id:'SA',region:'A',name:'Port Augusta, South Australia',
    desc:'A gateway to the continent. Central location means fast spread in all directions, but summers are punishing.',
    pros:'Central — fastest access to all mainland regions',cons:'Harsh dry summers, limited water between areas',
-   bonus:{migrationSpeed:2,droughtResistance:1}},
+   bonus:{migrationSpeed:2,droughtResistance:1},spawnRow:14,spawnCol:14},
   {id:'WA',region:'W',name:'Swan River, Western Australia',
    desc:'Isolated from eastern threats longer than anywhere else. Vast open grasslands with few native competitors.',
    pros:'Isolated from eastern diseases initially, enormous range available',cons:'Far from Tasmania and islands, arid interior',
-   bonus:{droughtResistance:2,camouflage:1}},
+   bonus:{droughtResistance:2,camouflage:1},spawnRow:16,spawnCol:5},
   {id:'NT',region:'N',name:'Darwin, Northern Territory',
    desc:'Tropical north with seasonal monsoons. Explosive wet-season growth, but extreme heat and unique predators.',
    pros:'Massive wet-season productivity, fewer foxes early on',cons:'Extreme heat, seasonal flooding, crocodiles near coast',
-   bonus:{bravery:2,size:1}},
+   bonus:{bravery:2,size:1},spawnRow:1,spawnCol:19},
 ];
 
 const POP_CHOICES=[
@@ -783,6 +860,113 @@ const STAT_DEFS=[
 
 const MAX_SEASONS=30;
 
+// Native species tracked for ecological-impact reporting. threshold = the
+// nativeImpact value (0-100) at which that species is driven locally extinct.
+// Loss is PERMANENT — a species doesn't come back even if impact later falls.
+const NATIVES=[
+  {id:'bilby',      name:'Greater Bilby',        threshold:30},
+  {id:'bettong',    name:'Burrowing Bettong',     threshold:45},
+  {id:'bandicoot',  name:'Barred Bandicoot',      threshold:58},
+  {id:'quoll',      name:'Western Quoll',         threshold:72},
+  {id:'malleefowl', name:'Malleefowl',            threshold:86},
+];
+function updateNativeImpact(){
+  const popFactor=Math.min(60,Math.log10(Math.max(10,GS.pop))/Math.log10(1e8)*60);
+  const terrFactor=Math.min(40,GS.territory*0.4);
+  GS.nativeImpact=Math.min(100,popFactor+terrFactor);
+  NATIVES.forEach(n=>{if(GS.nativeImpact>=n.threshold)GS.nativesLost.add(n.id)});
+}
+function ecoCostLabel(n){
+  if(n===0)return'MINIMAL';
+  if(n===1)return'MODERATE';
+  if(n<=3)return'SEVERE';
+  return'CATASTROPHIC';
+}
+
+// Named champions — the first individual whose trait crosses "exceptional"
+// (7/10) after a selection event. Reinforces that the fittest individuals
+// disproportionately shape the next generation, not just "the population".
+const CHAMPION_NAMES=['Whiskers','Bramble','Clover','Ash','Flint','Storm','Ember','Thistle','Briar','Hazel','Rusty','Shadow','Dusty','Fern','Copper','Sage'];
+function championStory(statKey,value){
+  const s=STAT_DEFS.find(x=>x.id===statKey);
+  const name=CHAMPION_NAMES[Math.floor(Math.random()*CHAMPION_NAMES.length)];
+  const label=(s?s.label:statKey).toLowerCase();
+  return{name,statKey,value,
+    text:`${name} — a rabbit whose ${label} was so far above the rest of the colony that its descendants now dominate that trait across the whole population.`};
+}
+
+// Embedded biology check-ins — a quick MCQ tied to specific events, asked once
+// per game the first time that event fires. Welds the gameplay moment directly
+// to the concept it's demonstrating. Correct answers grant a small genetics bonus.
+const MCQ_BANK={
+  // ── ABIOTIC vs BIOTIC FACTOR IDENTIFICATION ──
+  // Same 4-option template throughout so students learn the pattern:
+  // classify the factor as abiotic/biotic, AND predict the population effect.
+  // Both key terms are defined in every question — no assumed prior teaching.
+  first_winter:{topic:'ABIOTIC OR BIOTIC?',
+    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). A sudden cold snap kills many kits overnight. Is "cold temperature" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+    options:['Abiotic factor — likely to decrease the population','Abiotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Biotic factor — likely to increase the population'],
+    correct:0,bonusStat:'droughtResistance',
+    explain:'Temperature is non-living, so this is an ABIOTIC factor. Cold kills vulnerable individuals (especially young kits), decreasing the population — but survivors tend to have better cold/heat tolerance, which gets passed on.'},
+  eagle_attack:{topic:'ABIOTIC OR BIOTIC?',
+    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). Wedge-tailed eagles begin hunting rabbits that stray from their burrows. Is "eagle predation" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+    options:['Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to decrease the population'],
+    correct:2,bonusStat:'predatorDefense',
+    explain:'A predator is a living organism, so predation is a BIOTIC factor. It directly removes individuals from the population, decreasing it — and selects for rabbits with better predator defence and camouflage.'},
+  first_drought:{topic:'ABIOTIC OR BIOTIC?',
+    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). The rains fail completely and waterholes dry up. Is "drought" (lack of water) abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+    options:['Biotic factor — likely to decrease the population','Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population','Abiotic factor — likely to decrease the population'],
+    correct:3,bonusStat:'droughtResistance',
+    explain:'Water availability is non-living, so drought is an ABIOTIC factor. Less water means less food and more deaths, decreasing the population — while survivors tend to have stronger drought tolerance.'},
+  dingo_pack:{topic:'ABIOTIC OR BIOTIC?',
+    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). A pack of dingoes learns where your warrens are and hunts every evening. Is "dingo predation" abiotic or biotic, and what effect would it most likely have on the rabbit population?',
+    options:['Abiotic factor — likely to decrease the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population'],
+    correct:1,bonusStat:'predatorDefense',
+    explain:'Dingoes are living organisms, so this is a BIOTIC factor (predation). It reduces the population directly, and survivors tend to be more cautious or better defended.'},
+  flooding:{topic:'ABIOTIC OR BIOTIC?',
+    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). Unprecedented rainfall floods the river systems, drowning low-lying warrens. Is "flooding" abiotic or biotic, and what is its IMMEDIATE effect on the rabbit population?',
+    options:['Biotic factor — likely to increase the population','Abiotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to decrease the population'],
+    correct:3,bonusStat:'migrationSpeed',
+    explain:'Water is non-living, so flooding is an ABIOTIC factor. The immediate effect is a population decrease from drowning — though the nutrient-rich soil left behind can cause a boom afterwards. Abiotic factors can have both negative and positive knock-on effects.'},
+  native_comp:{topic:'ABIOTIC OR BIOTIC?',
+    q:'An abiotic factor is a NON-LIVING part of the environment (e.g. temperature, water, sunlight, fire). A biotic factor is a LIVING thing (e.g. a predator, competitor, or disease-causing organism). Native bilbies and bettongs are competing with rabbits for the same burrows and limited food. Is "competition between species" abiotic or biotic, and what effect does competition usually have on the population being outcompeted?',
+    options:['Abiotic factor — likely to decrease that population','Biotic factor — likely to increase that population','Abiotic factor — likely to increase that population','Biotic factor — likely to decrease that population'],
+    correct:3,bonusStat:'foodFinding',
+    explain:'Competition between living species is a BIOTIC factor. When two species compete for the same limited resources, the less successful competitor\'s population tends to decrease — part of why rabbits are so damaging to Australia\'s native wildlife.'},
+
+  // ── SELECTION & GENETICS CONCEPTS ──
+  myxomatosis:{topic:'NATURAL SELECTION',
+    q:'Natural selection is the process where individuals with helpful traits are more likely to survive and reproduce, so those traits become more common in the next generation. Myxomatosis kills up to 99% of a naive rabbit population. Why did the SURVIVORS have higher disease resistance than the population as a whole started with?',
+    options:['They took medicine to protect themselves','The disease killed the least-resistant individuals first, leaving more resistant survivors to reproduce','Rabbits deliberately evolved resistance because they needed it','Resistance was inherited directly from the original 24 rabbits'],
+    correct:1,bonusStat:'diseaseResistance',
+    explain:'This is natural selection: the virus removed the least-fit individuals. It didn\'t "give" anyone resistance — it revealed variation that already existed and changed which traits became common.'},
+  khaleesi:{topic:'KEY TERM',
+    q:'A new virus (RHDV) sweeps through your colony, and survivors are more disease-resistant than before. Which term correctly describes what just happened?',
+    options:['Genetic drift — random chance changes which genes get passed on, unrelated to any survival advantage','Natural selection — individuals with helpful traits survive and reproduce more, so those traits become more common','Mutation — a random change appears in an individual\'s DNA','Artificial selection — humans choose which individuals get to breed'],
+    correct:1,bonusStat:'diseaseResistance',
+    explain:'Natural selection — a non-random process driven by the environment (the virus). Genetic drift, by contrast, is random and matters most in small populations; you may see that one appear in its own event.'},
+  overpopulation:{topic:'COMPETITION',
+    q:'In "Too Many Mouths," a famine begins because there isn\'t enough food for everyone. Why did larger, better-food-finding rabbits survive at higher rates?',
+    options:['Farmers fed them directly','They could out-compete others for scarce food and space','They migrated away entirely before the famine hit','It was random chance, unrelated to their traits'],
+    correct:1,bonusStat:'foodFinding',
+    explain:'When a resource becomes limiting, individuals better able to acquire it are more likely to survive — selection driven by competition within the same species.'},
+  cull:{topic:'POPULATION ECOLOGY',
+    q:'A national rabbit-control (cull) program launches. Sometimes, killing a large share of a population causes the SURVIVORS to breed faster than before, offsetting or even exceeding the cull\'s effect. Why does this happen?',
+    options:['Rabbits deliberately breed more out of spite','Killing rabbits frees up food and burrow space, so survivors have more resources and breed faster — this is called compensatory reproduction','The cull accidentally kills the rabbits\' predators instead','Poison bait acts as a fertiliser for grass'],
+    correct:1,bonusStat:'litterSize',
+    explain:'This is density-dependent compensation: reducing population density below what the land can support frees up resources, and survivors respond with higher reproduction.'},
+  genetic_drift:{topic:'KEY TERM',
+    q:'Genetic drift is a RANDOM change in how common a trait is in a population — it is NOT caused by natural selection (i.e. it isn\'t because the trait helped anyone survive). What makes genetic drift especially powerful in SMALL populations?',
+    options:['Small populations have no genetic variation at all','In small populations, random chance has a much bigger relative effect on which genes get passed to the next generation','Small populations physically cannot reproduce','Predators specifically target small populations'],
+    correct:1,bonusStat:null,
+    explain:'In a huge population, random ups and downs average out. In a small one, a handful of individuals breeding (or not) can shift the whole gene pool by chance alone — no selective advantage required.'},
+  poison_bait:{topic:'EVOLUTION IN ACTION',
+    q:'A 1080 poison-baiting program is repeated over several seasons, and the rabbit population becomes more tolerant of the poison over time. Which explanation is biologically correct?',
+    options:['Individual rabbits build immunity during their lifetime, like a vaccine','Susceptible individuals die each time baiting occurs, so tolerant individuals make up a larger share of the next generation','The poison breaks down chemically and stops working','Rabbits learn to recognise and avoid all poisoned areas after one exposure'],
+    correct:1,bonusStat:'diseaseResistance',
+    explain:'This is selection again, not learning within a lifetime: repeated exposure doesn\'t make individual rabbits more tolerant — it removes the susceptible ones each round, so tolerance rises across the population over generations.'},
+};
+
 // ═══════════════════════════════════════════════════════
 //  EVENTS DATABASE
 // ═══════════════════════════════════════════════════════
@@ -801,7 +985,10 @@ const EVENTS=[
      fx:{popMult:.87,statDeltas:{size:.5,bravery:-.5}}},
     {text:'Risk digging deeper — exhausting work in frozen ground',
      out:'Many adults die of exposure, but the warren is now superior. Future winters will be far easier.',
-     fx:{popMult:.74,statDeltas:{size:1,droughtResistance:.5}}},
+     fx:{popMult:.74,statDeltas:{size:1,droughtResistance:.5}},
+     risky:true,riskChance:.25,
+     bigFx:{popMult:.90,statDeltas:{size:2,droughtResistance:2}},
+     bigWin:'Against all odds, the warrens go deep and hold. The colony emerges lean and incredibly resilient. Future winters will never threaten these burrowers again.'},
     {text:'Migrate toward the coast — warmer microclimate near the water',
      out:'The coastal area is slightly warmer. The population adapts to new terrain and grows more mobile.',
      fx:{popMult:.91,statDeltas:{migrationSpeed:1,bravery:.5}}},
@@ -813,16 +1000,16 @@ const EVENTS=[
    choices:[
     {text:'Restrict feeding to dawn and dusk only — hide underground during the day',
      out:'The population permanently shifts to crepuscular feeding — a real behavioural adaptation.',
-     fx:{popMult:.93,statDeltas:{predatorDefense:1,foodFinding:-.5}}},
+     fx:{selectStat:'predatorDefense',baseMortality:.08,statDeltas:{foodFinding:-.5}}},
     {text:'Spread out widely — harder for eagles to concentrate attacks',
      out:'Dispersal works. Some rabbits push into new untested territory in the process.',
      fx:{popMult:.90,statDeltas:{bravery:1,migrationSpeed:.5}}},
     {text:'Continue normal behaviour — eagle numbers are naturally limited',
      out:'The eagles take a heavy toll. Survivors are faster and more cautious.',
-     fx:{popMult:.78,statDeltas:{migrationSpeed:1.5,camouflage:1}}},
+     fx:{selectStat:'predatorDefense',baseMortality:.24,statDeltas:{migrationSpeed:.75}}},
     {text:'Build covered runs of dead branches — natural camouflage overhead',
      out:'Clever construction reduces eagle kills dramatically. Camouflage instincts sharpen.',
-     fx:{popMult:.95,statDeltas:{camouflage:2,size:-.5}}},
+     fx:{selectStat:'camouflage',baseMortality:.06,statDeltas:{size:-.5}}},
    ]},
 
   {id:'good_season',phase:'early',cat:'ABIOTIC EVENT',sprite:'clover',cyclic:true,
@@ -831,7 +1018,10 @@ const EVENTS=[
    choices:[
     {text:'Breed to maximum — take full advantage of the conditions',
      out:'The population surges dramatically. Grassland is briefly overgrazed, but numbers are now enormous.',
-     fx:{popMult:2.8,statDeltas:{litterSize:1,foodFinding:-.5}}},
+     fx:{popMult:3.5,statDeltas:{litterSize:1,foodFinding:-.5}},
+     risky:true,riskChance:.25,
+     bigFx:{popMult:5.5,statDeltas:{litterSize:2,foodFinding:-.5}},
+     bigWin:'An extraordinary mega-season — kits survive at impossible rates, the grasslands hold, and the colony reaches a scale never seen before. This is the boom of the century.'},
     {text:'Breed moderately — store energy reserves for when conditions turn harsh',
      out:'Steady strong growth. Well-nourished rabbits develop superior immune function.',
      fx:{popMult:2.0,statDeltas:{diseaseResistance:1,size:.5}}},
@@ -846,10 +1036,10 @@ const EVENTS=[
    choices:[
     {text:'Stay — dig deeper to find moisture, eat whatever is available',
      out:'Brutal. Many die. But survivors have developed extraordinary drought tolerance — passed on to every generation after.',
-     fx:{popMult:.58,statDeltas:{droughtResistance:2.5,size:-.5}}},
+     fx:{selectStat:'droughtResistance',baseMortality:.42,statDeltas:{size:-.5}}},
     {text:'Follow dry creek beds — seek water at the river margins',
      out:'A long march. Many don\'t arrive. But a water source is found and the colony survives.',
-     fx:{popMult:.70,statDeltas:{migrationSpeed:1.5,droughtResistance:.5}}},
+     fx:{selectStat:'droughtResistance',baseMortality:.30,statDeltas:{migrationSpeed:1}}},
     {text:'Raid nearby farmland — water troughs and irrigated crops',
      out:'The farmers are furious. Organised shooting begins. But the colony survives the drought.',
      fx:{popMult:.82,statDeltas:{bravery:1,predatorDefense:-1}}},
@@ -861,13 +1051,13 @@ const EVENTS=[
    choices:[
     {text:'Dig decoy burrow entrances — confuse the dingoes with false tunnels',
      out:'Clever. The dingoes waste time at empty tunnels. Deceptive burrowing becomes ingrained.',
-     fx:{popMult:.93,statDeltas:{camouflage:2,bravery:-.5}}},
+     fx:{selectStat:'camouflage',baseMortality:.08,statDeltas:{bravery:-.5}}},
     {text:'Relocate the main warren — abandon this location entirely',
      out:'New warrens established in safer locations. Migration becomes faster and more efficient.',
      fx:{popMult:.88,statDeltas:{migrationSpeed:1.5,predatorDefense:.5}}},
     {text:'Stand ground — sheer colony size deters individual attacks',
      out:'Numbers provide some safety. Larger, bolder individuals are favoured by selection.',
-     fx:{popMult:.85,statDeltas:{size:1,predatorDefense:1}}},
+     fx:{selectStat:'predatorDefense',baseMortality:.16,statDeltas:{size:.5}}},
    ]},
 
   {id:'farmers_fence',phase:'early',cat:'HUMAN IMPACT',sprite:'fence',
@@ -892,13 +1082,13 @@ const EVENTS=[
    choices:[
     {text:'Increase burrow depth and add multiple emergency exits',
      out:'The improved warrens provide real protection. A costly adaptation but effective.',
-     fx:{popMult:.87,statDeltas:{predatorDefense:2,migrationSpeed:-.5}}},
+     fx:{selectStat:'predatorDefense',baseMortality:.14,statDeltas:{migrationSpeed:-.5}}},
     {text:'Expand rapidly to stay ahead of fox territories',
      out:'Moving quickly into fox-free zones works — for now. But spread thin means vulnerability.',
      fx:{popMult:.82,statDeltas:{migrationSpeed:2,bravery:1},terrBonus:4}},
     {text:'Adapt coat colour — lighter pelts are harder for foxes to spot at night',
      out:'Natural selection favours lighter, more camouflaged individuals. Fox kill rates drop.',
-     fx:{popMult:.90,statDeltas:{camouflage:2.5,litterSize:-.5}}},
+     fx:{selectStat:'camouflage',baseMortality:.11,statDeltas:{litterSize:-.5}}},
    ]},
 
   {id:'rabbit_proof_fence',phase:'mid',cat:'HUMAN IMPACT',sprite:'fence',
@@ -922,13 +1112,13 @@ const EVENTS=[
    choices:[
     {text:'Disperse immediately — split into isolated small groups to slow transmission',
      out:'Isolation works. Spread slows. Isolated groups escape entirely. Survivors carry resistance that changes the species forever.',
-     fx:{popMult:.10,statDeltas:{diseaseResistance:3,migrationSpeed:1}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.90,statDeltas:{migrationSpeed:.5}}},
     {text:'Quarantine the sick — healthy rabbits maintain strict distance from dying animals',
      out:'Natural quarantine. Survival rates slightly higher. Strong resistance emerges in every survivor.',
-     fx:{popMult:.16,statDeltas:{diseaseResistance:2.5,predatorDefense:-1}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.84,statDeltas:{predatorDefense:-.5}}},
     {text:'Continue normal behaviour — with millions, even 1% survival is thousands',
      out:'The death toll is incomprehensible. But the survivors — every one resistant — rebuild rapidly. The species is permanently changed.',
-     fx:{popMult:.05,statDeltas:{diseaseResistance:4.5,litterSize:1}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.95,statDeltas:{litterSize:.5}}},
    ]},
 
   {id:'overpopulation',phase:'mid',cat:'BIOTIC EVENT',sprite:'rabbit',
@@ -937,7 +1127,10 @@ const EVENTS=[
    choices:[
     {text:'Allow natural die-off — let the weakest die so the strongest survive',
      out:'A brutal culling by famine. Population crashes. Every surviving animal is among the fittest. Natural selection at full force.',
-     fx:{popMult:.42,statDeltas:{size:1.5,foodFinding:2,droughtResistance:1}}},
+     fx:{popMult:.42,statDeltas:{size:1.5,foodFinding:2,droughtResistance:1}},
+     risky:true,riskChance:.30,
+     bigFx:{popMult:.62,statDeltas:{size:2.5,foodFinding:3,droughtResistance:2,litterSize:1}},
+     bigWin:'The famine was fierce but brief — the remaining animals are extraordinary specimens, the finest the colony has ever produced. Population rebounds faster than anyone expected.'},
     {text:'Trigger mass migration — push vast numbers outward into new territory',
      out:'Famine drives a desperate exodus. Many die in unfamiliar terrain, but new regions are rapidly colonised.',
      fx:{popMult:.55,statDeltas:{migrationSpeed:2,bravery:1},terrBonus:9}},
@@ -982,7 +1175,10 @@ const EVENTS=[
      fx:{popMult:.78,statDeltas:{migrationSpeed:1.5,bravery:1}}},
     {text:'Stay — the deepest warrens go far enough underground to survive',
      out:'Catastrophic losses below ground. Survivors emerge to find massively enriched soil and explosive new grass.',
-     fx:{popMult:.52,statDeltas:{size:1,droughtResistance:.5,litterSize:2}}},
+     fx:{popMult:.52,statDeltas:{size:1,droughtResistance:.5,litterSize:2}},
+     risky:true,riskChance:.25,
+     bigFx:{popMult:.85,statDeltas:{size:2,droughtResistance:1,litterSize:3}},
+     bigWin:'The deepest chambers held! Survivors emerge to find nutrient-drenched soil and grass coming up overnight. An immediate explosive breeding season follows — the flood was a gift.'},
     {text:'Use the floodwaters to migrate — debris carries rabbits across rivers',
      out:'Risky. But new territory on the far bank is colonised by those who survive the drift.',
      fx:{popMult:.81,statDeltas:{bravery:2,migrationSpeed:1},terrBonus:3}},
@@ -995,13 +1191,13 @@ const EVENTS=[
    choices:[
     {text:'Rely on myxomatosis survivors — their resistance may cross-protect',
      out:'Myxomatosis survivors show meaningful resistance. A severe hit, but a resistant core survives.',
-     fx:{popMult:.14,statDeltas:{diseaseResistance:3.5,litterSize:2}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.86,statDeltas:{litterSize:1}}},
     {text:'Maximum dispersal — scatter into isolated pockets across the entire range',
      out:'Isolation prevents blanket spread. Some populations escape entirely.',
-     fx:{popMult:.21,statDeltas:{migrationSpeed:1.5,diseaseResistance:2}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.79,statDeltas:{migrationSpeed:1}}},
     {text:'Continue — with enough rabbits, even 5% survival means millions',
      out:'The death toll is almost incomprehensible. But every survivor carries resistance genes. The species that emerges is nearly indestructible.',
-     fx:{popMult:.04,statDeltas:{diseaseResistance:5,litterSize:3,size:1}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.96,statDeltas:{litterSize:1.5,size:.5}}},
    ]},
 
   {id:'urban_sprawl',phase:'late',cat:'HUMAN IMPACT',sprite:'city',
@@ -1081,13 +1277,13 @@ const EVENTS=[
    choices:[
     {text:'Rely on natural food caution — rabbits are wary of unfamiliar food sources',
      out:'Innate neophobia helps. Some rabbits learn to avoid the bait. Genetic caution becomes a survival trait.',
-     fx:{popMult:.74,statDeltas:{foodFinding:1,camouflage:.5}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.26,statDeltas:{foodFinding:.5,camouflage:.5}}},
     {text:'Switch to natural food sources only — avoid all human-associated food',
      out:'Avoiding farmland costs food access but keeps the colony largely intact.',
-     fx:{popMult:.83,statDeltas:{droughtResistance:1,diseaseResistance:1,foodFinding:-.5}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.17,statDeltas:{droughtResistance:.5,foodFinding:-.5}}},
     {text:'Continue feeding normally — losses will be severe but numbers are overwhelming',
      out:'Casualties are severe. But the surviving core carries resistance to the toxin.',
-     fx:{popMult:.52,statDeltas:{diseaseResistance:1.5,size:1}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.48,statDeltas:{size:.5}}},
    ]},
 
   {id:'native_comp',phase:'any',cat:'BIOTIC EVENT',sprite:'rabbit',
@@ -1111,13 +1307,16 @@ const EVENTS=[
    choices:[
     {text:'Dive deep and seal the warren entrance against smoke and heat',
      out:'Underground provides real protection. Survivors emerge to find the burned landscape recovering fast.',
-     fx:{popMult:.64,statDeltas:{size:.5,droughtResistance:1}}},
+     fx:{selectStat:'droughtResistance',baseMortality:.36,statDeltas:{size:.5}}},
     {text:'Flee ahead of the fire front — run flat out toward unburned grassland',
      out:'Fast runners survive. A brutal selection event for speed. Post-fire regrowth is extraordinarily rich.',
-     fx:{popMult:.57,statDeltas:{migrationSpeed:2,bravery:1}}},
+     fx:{selectStat:'migrationSpeed',baseMortality:.43,statDeltas:{bravery:1}}},
     {text:'Move back into the burned area immediately — post-fire regrowth is phenomenally nutritious',
      out:'Ash-enriched soil produces the richest grass of the year. A massive population boom follows.',
-     fx:{popMult:.70,statDeltas:{foodFinding:1.5,litterSize:1}}},
+     fx:{popMult:.70,statDeltas:{foodFinding:1.5,litterSize:1}},
+     risky:true,riskChance:.20,
+     bigFx:{popMult:1.15,statDeltas:{foodFinding:3,litterSize:2}},
+     bigWin:'Perfect timing. First rains hit ash-enriched soil and the grass is impossibly rich green. An extraordinary boom follows — the fire was the best thing that ever happened to this colony.'},
    ]},
 
   {id:'cull',phase:'any',cat:'HUMAN IMPACT',sprite:'bulldozer',
@@ -1126,13 +1325,16 @@ const EVENTS=[
    choices:[
     {text:'Increase breeding rate dramatically — replace losses faster than the cull can act',
      out:'Numbers fight back against the cull. The sheer reproductive rate overwhelms the program.',
-     fx:{popMult:.68,statDeltas:{litterSize:2,diseaseResistance:-1}}},
+     fx:{popMult:.68,statDeltas:{litterSize:2,diseaseResistance:-1}},
+     risky:true,riskChance:.25,
+     bigFx:{popMult:.95,statDeltas:{litterSize:3,diseaseResistance:-1}},
+     bigWin:'For every rabbit killed, four more are born. The cull cannot keep pace. The program is abandoned as politically and economically futile. The Republic is unstoppable.'},
     {text:'Go nocturnal and deeper underground — make the colony nearly invisible',
      out:'Rabbits become dramatically harder to find and shoot. The cull kills far fewer than projected.',
-     fx:{popMult:.82,statDeltas:{camouflage:2,predatorDefense:1}}},
+     fx:{selectStat:'camouflage',baseMortality:.18,statDeltas:{predatorDefense:.5}}},
     {text:'Scatter into many small groups — harder to locate and kill than large warrens',
      out:'Dispersal makes the cull inefficient. The republic loses numbers but survives distributed across a vast area.',
-     fx:{popMult:.78,statDeltas:{migrationSpeed:1.5,bravery:1}}},
+     fx:{selectStat:'migrationSpeed',baseMortality:.22,statDeltas:{bravery:1}}},
    ]},
 
   {id:'warm_winter',phase:'any',cat:'ABIOTIC EVENT',sprite:'clover',cyclic:true,
@@ -1141,7 +1343,7 @@ const EVENTS=[
    choices:[
     {text:'Breed to absolute maximum — a chance like this may not come again soon',
      out:'Population surges to new heights. Grasslands are put under significant pressure.',
-     fx:{popMult:2.4,statDeltas:{litterSize:.5,droughtResistance:-.5}}},
+     fx:{popMult:3.0,statDeltas:{litterSize:.5,droughtResistance:-.5}}},
     {text:'Invest in territory expansion instead of population growth',
      out:'Scout parties push aggressively into new areas while conditions are perfect.',
      fx:{popMult:1.7,statDeltas:{migrationSpeed:2,bravery:.5},terrBonus:7}},
@@ -1168,10 +1370,24 @@ const EVENTS=[
    choices:[
     {text:'Trust in accumulated resistance — your genetics have been shaped by previous outbreaks',
      out:'Prior exposure provides substantial protection. Losses are significant but survivable.',
-     fx:{popMult:.45,statDeltas:{diseaseResistance:1.5}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.55}},
     {text:'Isolate affected individuals immediately — ruthless triage',
      out:'Isolation reduces spread. A painful strategy but it limits the damage.',
-     fx:{popMult:.60,statDeltas:{diseaseResistance:1,predatorDefense:-.5}}},
+     fx:{selectStat:'diseaseResistance',baseMortality:.40,statDeltas:{predatorDefense:-.5}}},
+   ]},
+
+  // Tier-3 surprise: genetic drift. Only eligible while the population is
+  // small — this is the point. Drift (random sampling luck) matters far more
+  // when there are few individuals; in a huge population it washes out.
+  // The specific trait/direction is randomised at applyChoice() time, not authored.
+  {id:'genetic_drift',phase:'any',cat:'POPULATION GENETICS',sprite:'rabbit',cyclic:true,maxPop:15000,
+   title:'THE DRIFT OF SMALL NUMBERS',
+   body:'Your colony is still small — small enough that pure chance, not the environment, can reshape which genes become common. A handful of individuals happened to breed more this season, for no adaptive reason at all. This is genetic drift.',
+   choices:[
+    {text:'Let nature take its course',
+     out:'', // filled dynamically in applyChoice() — the stat and direction are random
+     driftPick:true,
+     fx:{_noSound:true}},
    ]},
 ];
 
@@ -1186,6 +1402,15 @@ function newGS(){
     regions:[], fadingRegions:{},// id->turnsAtLowDensity
     stats:{droughtResistance:3,foodFinding:3,bravery:3,predatorDefense:3,
            size:3,migrationSpeed:3,diseaseResistance:3,camouflage:3,litterSize:3},
+    // Spread = how much variation exists within the population for each trait.
+    // Selection events narrow it (bottleneck); drift/founder effects can too.
+    statSpread:{droughtResistance:2.5,foodFinding:2.5,bravery:2.5,predatorDefense:2.5,
+           size:2.5,migrationSpeed:2.5,diseaseResistance:2.5,camouflage:2.5,litterSize:2.5},
+    diseaseExposures:0, poisonExposures:0, cullBoostTurns:0, champions:[], championedStats:new Set(),
+    mcqAsked:new Set(), currentMCQ:null,
+    nativeImpact:0, // 0-100, rises as population/territory grow — see NATIVES
+    nativesLost:new Set(), // extinctions are permanent even if impact later "improves"
+    lineageName:'',
     setup:{loc:null,pop:null,repro:null,boosts:[]},
     log:[], history:[],// [{season,pop,territory,event}]
     usedEvents:new Set(),
@@ -1212,7 +1437,57 @@ function fmtPop(n){
   if(n>=1000)return(n/1000).toFixed(0)+'K';
   return Math.round(n)+'';
 }
-function adjStat(k,v){GS.stats[k]=clamp(GS.stats[k]+v,1,10)}
+// Antagonistic trade-offs — no perfect organism. Raising one trait quietly
+// costs a linked trait (antagonistic pleiotropy). Only fires on increases.
+const TRAIT_TRADEOFFS={
+  size:           {pair:'droughtResistance', factor:0.35}, // bigger body = worse in heat/famine
+  litterSize:     {pair:'diseaseResistance', factor:0.30}, // quantity over quality
+  camouflage:     {pair:'droughtResistance', factor:0.25}, // heavier/darker coat = worse thermoregulation
+  predatorDefense:{pair:'migrationSpeed',    factor:0.25}, // costly defenses = slower
+};
+function adjStatCore(k,v){if(GS.stats[k]==null)return;GS.stats[k]=clamp(GS.stats[k]+v,1,10)}
+function adjStat(k,v){
+  adjStatCore(k,v);
+  const to=TRAIT_TRADEOFFS[k];
+  if(to&&v>0)adjStatCore(to.pair,-v*to.factor);
+}
+function clamp01(v){return Math.max(0.02,Math.min(0.99,v))}
+
+// ── SELECTION-BY-SURVIVAL ──
+// Given a baseline mortality rate and the trait it's selecting on, works out
+// the ACTUAL population multiplier from the population's current mean for
+// that trait (higher mean = more survivors), how far the mean shifts because
+// the low end was culled, and how much the surviving spread narrows
+// (bottleneck effect). This is what makes stats matter: the player doesn't
+// choose an outcome, they inherit one from where their population already was.
+function resolveSelectionEvent(baseMortality,statKey){
+  const mean=GS.stats[statKey]??5.5;
+  const spread=GS.statSpread[statKey]??2.5;
+  const BASELINE=5.5;
+  const mortality=clamp01(baseMortality*(1-(mean-BASELINE)/11));
+  const popMult=1-mortality;
+  const meanShift=Math.min(2.5,spread*mortality*0.7);
+  const newSpread=Math.max(0.6,spread*(1-mortality*0.55));
+  return{popMult,meanShift,newSpread,mortality,meanBefore:mean};
+}
+
+// ── BELL CURVE VISUAL (mean ± spread) ──
+// cullFrac: if set, shades the lower tail that gets removed by a selection event.
+function bellCurveSVG(mean,spread,w,h,cullFrac){
+  const cx=(mean/10)*w;
+  const sw=Math.max(4,(spread/10)*w*1.4);
+  const peakY=h*0.1,baseY=h-1;
+  const x0=Math.max(1,cx-sw),x1=Math.min(w-1,cx+sw);
+  let svg=`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="display:inline-block;vertical-align:middle;flex-shrink:0">`;
+  if(cullFrac){
+    const cullX=x0+(x1-x0)*cullFrac;
+    svg+=`<path d="M${x0},${baseY} Q${(x0+cullX)/2},${peakY+(baseY-peakY)*(1-cullFrac*0.6)} ${cullX},${baseY} Z" fill="#ff5522" opacity=".45"/>`;
+  }
+  svg+=`<path d="M${x0},${baseY} Q${cx},${peakY} ${x1},${baseY}" stroke="#33ff33" stroke-width="1.4" fill="none"/>`;
+  svg+=`<line x1="${cx}" y1="${peakY}" x2="${cx}" y2="${baseY}" stroke="#ffff33" stroke-width="1" stroke-dasharray="2,2"/>`;
+  svg+='</svg>';
+  return svg;
+}
 function calcTerritory(){
   const occ=GS.regions.reduce((s,id)=>s+(REGION[id]?.km2||0),0);
   return parseFloat(Math.min(100,(occ/TOTAL_KM2)*100).toFixed(2));
@@ -1275,7 +1550,12 @@ function toggleBoost(id){
   document.getElementById('boost-lbl').textContent=`SELECTED: ${pendingBoosts.length} / 2`;
   document.getElementById('boost-go').style.display=pendingBoosts.length===2?'inline-block':'none';
 }
-function confirmBoosts(){GS.setup.boosts=[...pendingBoosts];initGame()}
+function confirmBoosts(){GS.setup.boosts=[...pendingBoosts];renderStep(5)}
+function confirmLineage(){
+  const raw=document.getElementById('lineage-input').value.trim();
+  GS.lineageName=raw||`The ${GS.setup.loc?.name.split(',')[1]?.trim()||GS.setup.loc?.name||'Founding'} Line`;
+  initGame();
+}
 
 // ═══════════════════════════════════════════════════════
 //  INIT GAME
@@ -1292,7 +1572,10 @@ function initGame(){
   GS.territory=calcTerritory();
   GS.prevPop=GS.pop;
   GS.history.push({season:0,pop:GS.pop,territory:GS.territory,event:''});
+  sndTitleStop(); // theme music plays through the menu/setup, stops as the game begins
+  document.getElementById('hud-lineage').textContent=GS.lineageName.toUpperCase();
   showScreen('game');
+  sndGameStart();
   updateHUD();
   drawMap();
   renderStatSidebar();
@@ -1319,6 +1602,26 @@ function updateHUD(){
   sf.className='bfill seas'+(seasLeft<=5?' crit':seasLeft<=10?' warn':'');
   document.getElementById('v-seas').textContent=seasLeft;
   document.getElementById('hud-lbl').textContent=`SEASON ${GS.turn} OF ${MAX_SEASONS}`;
+  updateIslandWarn();
+  updateNativeImpact();
+  const impf=document.getElementById('b-impact');
+  impf.style.width=GS.nativeImpact+'%';
+  impf.className='bfill impact'+(GS.nativeImpact>=70?' crit':GS.nativeImpact>=40?' warn':'');
+  document.getElementById('v-impact').textContent=Math.round(GS.nativeImpact)+'%';
+  document.getElementById('native-list').innerHTML=NATIVES.map(n=>{
+    const lost=GS.nativesLost.has(n.id);
+    return`<span style="color:${lost?'#ff4444':'#88aaff'}">${n.name}: ${lost?'EXTINCT':'ok'}</span>`;
+  }).join(' &nbsp;·&nbsp; ');
+}
+function updateIslandWarn(){
+  const warn=document.getElementById('island-warn');
+  const onIsland=['T','L','F'].some(r=>GS.regions.includes(r));
+  if(onIsland){
+    warn.style.display='block';
+    warn.textContent=`🏝 RELAXED SELECTION: no predators on your island territory means predator defense & bravery are no longer under pressure — they're slowly decaying the longer you stay (island tameness). Predator Defense ${GS.stats.predatorDefense.toFixed(1)} · Bravery ${GS.stats.bravery.toFixed(1)}`;
+  } else {
+    warn.style.display='none';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1332,6 +1635,7 @@ function renderStatSidebar(){
     return `<div class="sbar-row">
       <span class="sbar-name">${s.label}</span>
       <div class="sbar-track"><div class="sbar-fill" id="sf-${s.id}" style="width:${pct}%;background:${col}"></div></div>
+      <span id="sc-${s.id}">${bellCurveSVG(v,GS.statSpread[s.id],44,15)}</span>
       <span class="sbar-val" id="sv-${s.id}">${v.toFixed(1)}</span>
     </div>`;
   }).join('');
@@ -1343,8 +1647,10 @@ function animateStatSidebar(){
     const col=v>=7?'#33ff33':v>=4?'#ffaa00':'#ff4422';
     const fillEl=document.getElementById('sf-'+s.id);
     const valEl=document.getElementById('sv-'+s.id);
+    const curveEl=document.getElementById('sc-'+s.id);
     if(fillEl){fillEl.style.width=pct+'%';fillEl.style.background=col}
     if(valEl)valEl.textContent=v.toFixed(1);
+    if(curveEl)curveEl.innerHTML=bellCurveSVG(v,GS.statSpread[s.id],44,15);
   });
 }
 
@@ -1353,17 +1659,28 @@ function animateStatSidebar(){
 // ═══════════════════════════════════════════════════════
 function drawMap(){
   const startReg=GS.setup.loc?.region;
-  let html='';
+  const spawnRow=GS.setup.loc?.spawnRow;
+  const spawnCol=GS.setup.loc?.spawnCol;
+  let html='',ri=0;
   for(const row of MAP_ROWS){
+    let ci=0;
     for(const ch of row){
-      if(ch==='.'){html+='<span class="cs"></span>';continue}
-      if(GS.turn<=1&&ch===startReg){html+=`<span class="cx" title="${REGION[ch]?.name}"></span>`;continue}
-      if(GS.fadingRegions[ch]){html+=`<span class="cf" title="${REGION[ch]?.name} — LOW DENSITY WARNING"></span>`;continue}
-      if(GS.regions.includes(ch)){html+=`<span class="co" title="${REGION[ch]?.name}"></span>`;continue}
-      if(REGION[ch]?.boat){html+=`<span class="ci" title="${REGION[ch]?.name}"></span>`;continue}
-      html+=`<span class="cu" title="${REGION[ch]?.name}"></span>`;
+      if(ch==='.'){html+='<span class="cs"></span>';ci++;continue}
+      if(GS.fadingRegions[ch]){html+=`<span class="cf" title="${REGION[ch]?.name} — LOW DENSITY WARNING"></span>`;ci++;continue}
+      // Home region: expands outward from spawn cell (radius grows 1 per 3 turns → 1 cell at turn 0)
+      if(ch===startReg&&spawnRow!=null){
+        const dist=Math.max(Math.abs(ri-spawnRow),Math.abs(ci-spawnCol));
+        const homeRadius=Math.min(10,Math.floor(GS.turn/3));
+        if(dist===0){html+=`<span class="cx" title="${REGION[ch]?.name} — STARTING ZONE"></span>`;}
+        else if(dist<=homeRadius&&GS.regions.includes(ch)){html+=`<span class="co" title="${REGION[ch]?.name}"></span>`;}
+        else{html+=`<span class="cu" title="${REGION[ch]?.name}"></span>`;}
+        ci++;continue;
+      }
+      if(GS.regions.includes(ch)){html+=`<span class="co" title="${REGION[ch]?.name}"></span>`;ci++;continue}
+      if(REGION[ch]?.boat){html+=`<span class="ci" title="${REGION[ch]?.name}"></span>`;ci++;continue}
+      html+=`<span class="cu" title="${REGION[ch]?.name}"></span>`;ci++;
     }
-    html+='<br>';
+    html+='<br>';ri++;
   }
   document.getElementById('map-grid').innerHTML=html;
 }
@@ -1372,13 +1689,22 @@ function drawMap(){
 //  POPULATION MECHANICS
 // ═══════════════════════════════════════════════════════
 function baseGrowth(){
-  const{foodFinding,litterSize,migrationSpeed,bravery}=GS.stats;
-  const rate=0.28+(foodFinding/10)*0.14+(litterSize/10)*0.12;
+  const{foodFinding,litterSize}=GS.stats;
+  let rate=0.28+(foodFinding/10)*0.14+(litterSize/10)*0.12;
+  // Tier-3: cull backfires. Density-dependent compensatory reproduction —
+  // killing rabbits frees up food/space, so survivors breed faster for a
+  // few seasons after a control program hits.
+  if(GS.cullBoostTurns>0){rate*=1.35;GS.cullBoostTurns--;}
   GS.pop=Math.round(GS.pop*(1+rate*GS.growMod));
   GS.pop=Math.max(1,GS.pop);
-  // Expansion attempt
-  const expChance=((migrationSpeed+bravery)/20)*0.32;
-  if(Math.random()<expChance)tryExpand();
+  // Tier-3: relaxed selection on islands. No predators on Tasmania/Lord Howe/
+  // Norfolk means predatorDefense/bravery are no longer under selective
+  // pressure, so they quietly decay the longer the population stays there
+  // (island tameness — the same effect seen in real island bird/mammal populations).
+  if(['T','L','F'].some(r=>GS.regions.includes(r))){
+    adjStatCore('predatorDefense',-0.04);
+    adjStatCore('bravery',-0.04);
+  }
   // Density check
   checkDensity();
   // Stasis
@@ -1387,23 +1713,19 @@ function baseGrowth(){
   GS.prevPop=GS.pop;
 }
 
-function tryExpand(){
-  const candidates=[];
+// Expansion is now a player decision (see openExpansionChoice/pickExpansion in
+// the game loop) rather than an automatic random pick.
+function getExpansionCandidates(){
+  const candidates=new Set();
   for(const r of GS.regions){
     for(const adj of(ADJ[r]||[])){
       if(!GS.regions.includes(adj)&&REGION[adj]&&!REGION[adj].boat){
-        // Need enough population density to expand
         const newUnits=totalDensityUnits()+rUnits(adj);
-        if(GS.pop>=newUnits*1.2)candidates.push(adj);
+        if(GS.pop>=newUnits*1.2)candidates.add(adj);
       }
     }
   }
-  if(candidates.length){
-    const pick=candidates[Math.floor(Math.random()*candidates.length)];
-    GS.regions.push(pick);
-    delete GS.fadingRegions[pick];
-    GS.territory=calcTerritory();
-  }
+  return[...candidates];
 }
 
 function checkDensity(){
@@ -1451,6 +1773,16 @@ function nextTurn(){
   GS.turn++;
   document.getElementById('out-box').classList.remove('open');
   baseGrowth();
+  const{migrationSpeed,bravery}=GS.stats;
+  const expChance=((migrationSpeed+bravery)/20)*0.32;
+  const candidates=getExpansionCandidates();
+  if(candidates.length&&Math.random()<expChance){
+    setTimeout(()=>openExpansionChoice(candidates),400);
+    return;
+  }
+  continueTurnFlow();
+}
+function continueTurnFlow(){
   // Check river crossing gamble
   if((GS.turn===GS.riverCrossSeason1&&!GS.riverCrossDone1)||(GS.turn===GS.riverCrossSeason2&&!GS.riverCrossDone2)){
     if(GS.turn===GS.riverCrossSeason1)GS.riverCrossDone1=true;
@@ -1475,6 +1807,26 @@ function nextTurn(){
   animateStatSidebar();
 }
 
+// ── PLAYER-DIRECTED EXPANSION ──
+function openExpansionChoice(candidates){
+  document.getElementById('expand-opts').innerHTML=candidates.map(r=>`
+    <div class="opt" onclick="pickExpansion('${r}')">
+      <div class="opt-t">${REGION[r].name}</div>
+      <div class="opt-d">${REGION[r].km2.toLocaleString()} km² of new territory</div>
+    </div>`).join('');
+  document.getElementById('expand-overlay').classList.add('open');
+}
+function pickExpansion(regionId){
+  document.getElementById('expand-overlay').classList.remove('open');
+  if(regionId){
+    GS.regions.push(regionId);
+    delete GS.fadingRegions[regionId];
+    GS.territory=calcTerritory();
+    drawMap();updateHUD();
+  }
+  continueTurnFlow();
+}
+
 function checkEnd(){
   if(GS.pop<10)return'extinction';
   if(GS.territory>=99.5)return'victory';
@@ -1488,6 +1840,7 @@ function pickEvent(){
   const phase=t<=10?'early':t<=22?'mid':'late';
   const eligible=EVENTS.filter(e=>{
     if(!e.cyclic&&GS.usedEvents.has(e.id))return false;
+    if(e.maxPop!=null&&GS.pop>e.maxPop)return false; // e.g. genetic drift only matters in small populations
     if(e.phase==='any')return true;
     if(e.phase===phase)return true;
     if(phase==='mid'&&e.phase==='early'&&t<=14)return true;
@@ -1503,6 +1856,7 @@ function pickEvent(){
 
 // ── DRAMATIC SCENE ──
 function showScene(ev){
+  sndDramatic();
   document.getElementById('scene-title').textContent=ev.title;
   document.getElementById('scene-body').textContent=ev.body;
   document.getElementById('scene-sprite-lg').innerHTML=spriteHTML(ev.sprite||'rabbit','',200);
@@ -1519,8 +1873,12 @@ function renderEvent(ev){
   document.getElementById('ev-title').textContent=ev.title;
   document.getElementById('ev-body').textContent=ev.body;
   document.getElementById('ev-sprite').innerHTML=spriteHTML(ev.sprite||'rabbit',ev.cat);
-  document.getElementById('choices').innerHTML=ev.choices.map((c,i)=>
-    `<button class="cbtn" onclick="choose(${i})">${c.text}</button>`).join('');
+  document.getElementById('choices').innerHTML=ev.choices.map((c,i)=>{
+    const cls='cbtn'+(c.risky?' cbtn-risky':'');
+    let label=c.text;
+    if(c.risky){const pct=Math.round(c.riskChance*100);label+=` <span style="font-size:10px;opacity:.85">⚡ HIGH RISK — ${pct}% chance of big gain</span>`;}
+    return`<button class="${cls}" onclick="choose(${i})">${label}</button>`;
+  }).join('');
 }
 
 // ── CHOICE ──
@@ -1539,17 +1897,82 @@ function choose(idx){
 function applyChoice(idx,doLog){
   const ev=GS.currentEvent;
   const choice=ev.choices[idx];
-  const fx=choice.fx;
+  const popBefore=GS.pop;
+  // Resolve risky outcome. Clone fx — it may point straight at the EVENTS
+  // array's data, and selection resolution below mutates popMult/statDeltas.
+  let fx={...(choice.fx||{})};
+  let outText=choice.out;
+  let isBigWin=false;
+  if(choice.risky&&Math.random()<choice.riskChance){
+    fx={...choice.bigFx};outText=choice.bigWin;isBigWin=true;
+  }
+  fx.statDeltas=fx.statDeltas?{...fx.statDeltas}:{};
+  // Selection-by-survival: choices tagged with selectStat don't get a fixed
+  // popMult — it's computed from the population's CURRENT genetics. Better
+  // stat mean = fewer deaths, and the survivors' mean rises because the
+  // low end of the distribution was the part that died.
+  let selInfo=null;
+  if(fx.selectStat){
+    let mortality=fx.baseMortality??0.5;
+    // Tier-3 surprises: myxo/RHDV/disease_surge attenuate with repeated exposure
+    // (viral coevolution favours strains that keep hosts alive longer to spread);
+    // 1080 poison exposure similarly builds physiological toxin tolerance.
+    if(fx.selectStat==='diseaseResistance'&&ev.cat==='DISEASE EVENT'){
+      mortality*=Math.max(0.45,1-GS.diseaseExposures*0.12);
+      GS.diseaseExposures++;
+    }
+    if(ev.id==='poison_bait'){
+      mortality*=Math.max(0.5,1-GS.poisonExposures*0.15);
+      GS.poisonExposures++;
+    }
+    const sel=resolveSelectionEvent(mortality,fx.selectStat);
+    fx.popMult=sel.popMult;
+    fx.statDeltas[fx.selectStat]=(fx.statDeltas[fx.selectStat]||0)+sel.meanShift;
+    GS.statSpread[fx.selectStat]=sel.newSpread;
+    selInfo={statKey:fx.selectStat,...sel};
+    if(fx.selectStat==='diseaseResistance'&&ev.cat==='DISEASE EVENT'&&GS.diseaseExposures>1){
+      selInfo.attenuationNote=`This is disease outbreak #${GS.diseaseExposures} — the virus itself is evolving to be less lethal (strains that keep hosts alive longer spread further). That's part of why this hit softer.`;
+    }
+    if(ev.id==='poison_bait'&&GS.poisonExposures>1){
+      selInfo.attenuationNote=`Exposure #${GS.poisonExposures} to 1080 baiting — surviving lineages are building genuine physiological tolerance to the toxin over time.`;
+    }
+  }
+  // Tier-3: cull backfires — compensatory reproduction kicks in regardless
+  // of which response the player chose.
+  let specialNote=null;
+  if(ev.id==='cull'){
+    GS.cullBoostTurns=4;
+    specialNote='COMPENSATORY REPRODUCTION: fewer competitors means more food and burrow space per survivor. Breeding rates will spike for several seasons — the control program may end up increasing your numbers.';
+  }
+  // Tier-3: genetic drift — a random trait wobbles by pure chance, NOT
+  // selection. Deliberately picked/applied here rather than authored, since
+  // the whole point is that it's not tied to any environmental pressure.
+  if(choice.driftPick){
+    const s=STAT_DEFS[Math.floor(Math.random()*STAT_DEFS.length)];
+    const mag=(0.4+Math.random()*0.9)*(Math.random()<0.5?-1:1);
+    fx.statDeltas[s.id]=(fx.statDeltas[s.id]||0)+mag;
+    outText=`With such a small population, chance alone reshuffled the gene pool this season — no environmental pressure did this. By pure luck, ${s.label.toLowerCase()} ${mag>0?'rose':'fell'} across the colony. This is genetic drift: real, but not adaptive.`;
+  }
   if(fx.popMult!=null)GS.pop=Math.max(5,Math.round(GS.pop*fx.popMult));
   if(fx.statDeltas)Object.entries(fx.statDeltas).forEach(([k,v])=>adjStat(k,v));
   if(fx.terrBonus)GS.territory=parseFloat(Math.min(100,GS.territory+fx.terrBonus).toFixed(2));
   if(fx.unlockRegion&&!GS.regions.includes(fx.unlockRegion)){
     GS.regions.push(fx.unlockRegion);GS.territory=calcTerritory();
   }
+  // Named champion — first time a selected trait crosses "exceptional" (7/10)
+  if(selInfo){
+    const finalVal=GS.stats[selInfo.statKey];
+    if(finalVal>=7&&!GS.championedStats.has(selInfo.statKey)){
+      GS.championedStats.add(selInfo.statKey);
+      const champ=championStory(selInfo.statKey,finalVal);
+      GS.champions.push({season:GS.turn,...champ});
+      selInfo.championText=`🏆 MEET ${champ.name.toUpperCase()}: ${champ.text}`;
+    }
+  }
   if(doLog)GS.log.push({season:GS.turn,event:ev.title,choice:choice.text});
   document.querySelectorAll('.cbtn').forEach(b=>b.disabled=true);
-  updateHUD();drawMap();animateStatSidebar();
-  showOutcomeOverlay(choice,fx,ev.title,ev.cat);
+  drawMap();animateStatSidebar();
+  showOutcomeOverlay({out:outText},fx,ev.title,ev.cat,popBefore,isBigWin,selInfo,specialNote);
 }
 
 function showOutcome(choice,fx){
@@ -1571,31 +1994,37 @@ function showOutcome(choice,fx){
 // ═══════════════════════════════════════════════════════
 //  EVOLUTION RUNNER MINI-GAME
 // ═══════════════════════════════════════════════════════
-let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:6,spawnT:60,rafId:null,startTs:0,pts:1,frame:0};
-const RC_W=580,RC_H=150,R_GNDH=110,R_X=70,R_W=18,R_H=14,JUMP_V=11,GRAV=.6,MAX_RUN_MS=120000;
+let RR={active:false,y:0,vy:0,obs:[],dist:0,speed:6,spawnT:60,rafId:null,startTs:0,pts:1,frame:0,jumpHeld:false,jumpBoostLeft:0};
+const RC_W=580,RC_H=150,R_GNDH=110,R_X=70,R_W=18,R_H=14,JUMP_V=6,GRAV=.6,JUMP_BOOST_FRAMES=10,MAX_RUN_MS=120000;
 
 function openRunner(){
   document.getElementById('runner-gameover').style.display='none';
   document.getElementById('runner-go').style.display='none';
-  RR={active:true,y:0,vy:0,obs:[],dist:0,speed:6,spawnT:60,rafId:null,startTs:0,pts:1,frame:0};
+  RR={active:true,y:0,vy:0,obs:[],dist:0,speed:6,spawnT:60,rafId:null,startTs:0,pts:1,frame:0,jumpHeld:false,jumpBoostLeft:0};
   document.getElementById('runner-overlay').classList.add('open');
   window.addEventListener('keydown',runnerKey);
+  window.addEventListener('keyup',runnerKeyUp);
   const cvs=document.getElementById('runner-canvas');
   cvs.addEventListener('touchstart',doJump,{passive:true});
+  cvs.addEventListener('touchend',releaseJump,{passive:true});
   RR.startTs=performance.now();
   RR.rafId=requestAnimationFrame(runnerLoop);
 }
 
 function runnerKey(e){if(e.code==='Space'||e.key===' '){e.preventDefault();doJump()}}
-function doJump(){if(RR.active&&RR.y<=0){RR.vy=JUMP_V;RR.y=1}}
+function runnerKeyUp(e){if(e.code==='Space'||e.key===' '){e.preventDefault();releaseJump()}}
+function doJump(){if(RR.active&&RR.y<=0){RR.vy=JUMP_V;RR.y=1;RR.jumpHeld=true;RR.jumpBoostLeft=JUMP_BOOST_FRAMES;sndJump()}}
+function releaseJump(){RR.jumpHeld=false;}
 
 function runnerLoop(ts){
   if(!RR.active)return;
   const elapsed=ts-RR.startTs;
   if(elapsed>=MAX_RUN_MS){endRunner(true);return}
-  // Physics
-  RR.vy-=GRAV;RR.y=Math.max(0,RR.y+RR.vy);
-  if(RR.y===0)RR.vy=0;
+  // Physics — gravity cancels out while jump is held, giving variable height
+  RR.vy-=GRAV;
+  if(RR.jumpHeld&&RR.jumpBoostLeft>0&&RR.y>0){RR.vy+=GRAV;RR.jumpBoostLeft--;}
+  RR.y=Math.max(0,RR.y+RR.vy);
+  if(RR.y===0){RR.vy=0;RR.jumpHeld=false;}
   // Speed ramp
   RR.speed=6+Math.min(18,elapsed/4000);
   // Spawn
@@ -1609,7 +2038,9 @@ function runnerLoop(ts){
   // Move obs
   RR.obs=RR.obs.filter(o=>{o.x-=RR.speed;return o.x>-20});
   RR.dist+=RR.speed;
-  RR.pts=Math.min(10,1+Math.floor(RR.dist/2800));
+  const newPts=Math.min(6,1+Math.floor(Math.floor(RR.dist/2800)/2));
+  if(newPts>RR.pts)sndRunnerLevelUp();
+  RR.pts=newPts;
   // Collision
   const rabY=R_GNDH-RR.y;
   for(const o of RR.obs){
@@ -1641,7 +2072,7 @@ function drawRunner(){
   ctx.fillStyle='#334433';ctx.font='11px monospace';
   ctx.fillText('DIST: '+Math.floor(RR.dist),10,16);
   // Pts bar
-  const pct=RR.pts/10;
+  const pct=RR.pts/6;
   const fill=document.getElementById('runner-pts-fill');
   const lbl=document.getElementById('runner-pts-label');
   if(fill)fill.style.width=(pct*100)+'%';
@@ -1668,9 +2099,11 @@ function drawRunnerRabbit(ctx,x,y){
 function endRunner(timeout){
   RR.active=false;
   window.removeEventListener('keydown',runnerKey);
+  window.removeEventListener('keyup',runnerKeyUp);
   cancelAnimationFrame(RR.rafId);
   const el=document.getElementById('runner-gameover');
   el.style.display='block';
+  if(timeout){sndPositive();}else{sndHit();}
   el.textContent=timeout?`TIME'S UP! You earned ${RR.pts} point${RR.pts!==1?'s':''}!`
     :`OUCH! You earned ${RR.pts} adaptation point${RR.pts!==1?'s':''}!`;
   document.getElementById('runner-go').style.display='inline-block';
@@ -1706,6 +2139,7 @@ function openAlloc(pts){
 function allocAdj(id,dir){
   if(dir===1&&allocRemaining<=0)return;
   if(dir===-1&&allocDelta[id]<=0)return;
+  sndClick();
   if(dir===1&&GS.stats[id]>=10)return;
   if(dir===-1&&GS.stats[id]<=1)return;
   allocDelta[id]+=dir;
@@ -1780,6 +2214,7 @@ function doTimingStop(){
   const success=timingPos>=timingZoneL&&timingPos<=(timingZoneL+timingZoneW-14);
   const resEl=document.getElementById('timing-result');
   if(success){
+    sndTimingSuccess();
     GS.timingResult='success';
     resEl.innerHTML='<span class="pos">✓ SUCCESS! The crossing was made!</span>';
     // Apply the island unlock
@@ -1787,6 +2222,7 @@ function doTimingStop(){
     ch.out='Against all odds, the crossing succeeds. The first rabbits arrive on the island. A new chapter of the Rabbit Republic begins.';
     applyChoice(GS.pendingIslandChoice,true);
   } else {
+    sndTimingFail();
     GS.timingResult='fail';
     resEl.innerHTML='<span class="neg">✗ MISSED. The crossing failed. Population lost.</span>';
     GS.pop=Math.max(5,Math.round(GS.pop*.85));
@@ -1826,27 +2262,50 @@ const END={
     lesson:'In 30 seasons of selective pressure, your choices shaped a population with unique genetics — some adapted to Australia, some struggling. Real rabbits took decades to spread and were subjected to exactly these events. The traits that survived — disease resistance, drought tolerance, camouflage — are the direct result of selective pressure from the environment.'},
 };
 
-function calcScore(){
-  const popScore=Math.round((Math.log10(Math.max(10,GS.pop))/Math.log10(600000000))*35);
-  const terrScore=Math.round(GS.territory*0.30);
-  const islandScore=(GS.regions.includes('T')?5:0)+(GS.regions.includes('L')?8:0)+(GS.regions.includes('F')?7:0);
+function calcScore(endType){
+  // Population /30 — log scale, 100M (a perfect run's peak) = full marks
+  const popScore=Math.min(30,Math.round(Math.log10(Math.max(10,GS.pop))/Math.log10(1e8)*30));
+  // Territory /25 — TOTAL_KM2 now = reachable regions, so 100% is achievable
+  const terrScore=Math.min(25,Math.round(GS.territory*0.25));
+  // Islands /10 — biosecurity breaches
+  const islandScore=(GS.regions.includes('T')?3:0)+(GS.regions.includes('L')?3:0)+(GS.regions.includes('F')?4:0);
+  // Genetics /25 — the core selective-pressure concept
   const avgStat=Object.values(GS.stats).reduce((s,v)=>s+v,0)/9;
-  const genScore=Math.round((avgStat/10)*20);
-  const total=Math.min(100,popScore+terrScore+islandScore+genScore);
-  return{total,popScore,terrScore,islandScore,genScore};
+  const genScore=Math.round((avgStat/10)*25);
+  // Survival /10 — reached S30 alive = 10, equilibrium = 5, extinction = 0
+  const survScore=endType==='extinction'?0:endType==='stasis'?5:10;
+  // Ecological Cost — a real penalty for native species driven extinct.
+  // This is what makes the S-rank "win" morally loaded: success here IS the invasion.
+  const ecoCost=GS.nativesLost.size*4;
+  const rawTotal=popScore+terrScore+islandScore+genScore+survScore;
+  const total=Math.max(0,Math.min(100,rawTotal-ecoCost));
+  return{total,popScore,terrScore,islandScore,genScore,survScore,ecoCost,nativesLostCount:GS.nativesLost.size};
+}
+function scoreRank(total){
+  if(total>=90)return{grade:'S',title:'APEX INVADER'};
+  if(total>=75)return{grade:'A',title:'PLAGUE PROPORTIONS'};
+  if(total>=60)return{grade:'B',title:'ESTABLISHED PEST'};
+  if(total>=40)return{grade:'C',title:'FOOTHOLD GAINED'};
+  if(total>=20)return{grade:'D',title:'STRUGGLING COLONY'};
+  return{grade:'F',title:'FAILED INVASION'};
 }
 
 function showEnd(type){
+  if(type==='victory'){sndVictory();}else if(type==='extinction'){sndExtinction();}else{sndEquilibrium();}
   const d=END[type]||END.time;
   document.getElementById('end-title').textContent=d.title;
   document.getElementById('end-title').className='end-title-el '+d.cls;
   document.getElementById('end-sub').textContent=d.sub;
-  const sc=calcScore();
+  const sc=calcScore(type);
+  const rank=scoreRank(sc.total);
   document.getElementById('score-num').textContent=sc.total;
+  document.getElementById('score-rank').textContent=`${rank.grade} · ${rank.title}`;
   document.getElementById('score-breakdown').textContent=
-    `Pop: ${sc.popScore}/35 · Territory: ${sc.terrScore}/30 · Islands: ${sc.islandScore}/20 · Genetics: ${sc.genScore}/20`;
+    `Pop: ${sc.popScore}/30 · Territory: ${sc.terrScore}/25 · Genetics: ${sc.genScore}/25 · Islands: ${sc.islandScore}/10 · Survival: ${sc.survScore}/10 · Ecological Cost: -${sc.ecoCost}`;
   buildGraph();
+  const lostNames=NATIVES.filter(n=>GS.nativesLost.has(n.id)).map(n=>n.name);
   document.getElementById('sum-box').innerHTML=[
+    ['Lineage',GS.lineageName],
     ['Final Population',fmtPop(GS.pop)],
     ['Territory Occupied',GS.territory.toFixed(1)+'% of Australia'],
     ['Regions Reached',GS.regions.map(id=>REGION[id]?.name||id).join(', ')||'—'],
@@ -1854,12 +2313,28 @@ function showEnd(type){
     ['Starting Location',GS.setup.loc?.name||'—'],
     ['Breeding Strategy',GS.setup.repro?.label||'—'],
     ['Islands Reached',[...GS.regions].filter(r=>REGION[r]?.boat).map(r=>REGION[r].name).join(', ')||'None'],
+    ['Native Species Lost',`${sc.nativesLostCount} of ${NATIVES.length} tracked${lostNames.length?' — '+lostNames.join(', '):''}`],
+    ['Ecological Cost',ecoCostLabel(sc.nativesLostCount)],
   ].map(([k,v])=>`<div class="sum-row"><span>${k}</span><span>${v}</span></div>`).join('');
   document.getElementById('dec-log').innerHTML=
     GS.log.map(d=>`<div>S${d.season} — <span style="color:#fff">${d.event}:</span> ${d.choice}</div>`).join('')||
     '<span style="color:#1a3a1a">No decisions recorded.</span>';
+  if(GS.champions.length){
+    document.getElementById('champions-wrap').style.display='block';
+    document.getElementById('champions-log').innerHTML=
+      GS.champions.map(c=>`<div>S${c.season} — <span style="color:#fff">${c.name}</span> (${STAT_DEFS.find(s=>s.id===c.statKey)?.label||c.statKey} ${c.value.toFixed(1)}): ${c.text}</div>`).join('');
+  }
   document.getElementById('lesson-box').innerHTML=
     `<div class="lesson-t">ECOLOGICAL DEBRIEF:</div>${d.lesson}`;
+  // Compared-to-history: anchors the fiction to the real 1859-2020s invasion.
+  const realMultiple=(1e10/Math.max(GS.pop,1)).toFixed(0);
+  document.getElementById('history-box').innerHTML=
+    `<div class="lesson-t" style="color:#ffaa00">COMPARED TO HISTORY:</div>
+     Real wild rabbits released in 1859 reached an estimated <strong style="color:#fff">10 billion</strong> at their peak,
+     spread across most of the continent within decades, and still cost Australia an estimated
+     <strong style="color:#fff">$200 million a year</strong> in agricultural damage today.
+     ${GS.lineageName} reached <strong style="color:#fff">${fmtPop(GS.pop)}</strong> —
+     ${GS.pop<1e10?`about 1/${realMultiple}th of the real historical peak`:'matching the scale of the real invasion'}.`;
   showScreen('end');
 }
 
@@ -1912,13 +2387,39 @@ function buildGraph(){
 // ═══════════════════════════════════════════════════════
 //  OUTCOME OVERLAY
 // ═══════════════════════════════════════════════════════
-function showOutcomeOverlay(choice,fx,evTitle,evCat){
+function showOutcomeOverlay(choice,fx,evTitle,evCat,popBefore,isBigWin,selInfo,specialNote){
   document.getElementById('oc-cat').textContent=evCat||'';
   document.getElementById('oc-title').textContent=evTitle||'';
-  document.getElementById('oc-text').textContent=choice.out||'Result applied.';
   const sign=fx.popMult==null?'neu':fx.popMult>=1.5?'pos':fx.popMult<0.85?'neg':'neu';
+  if(!fx._noSound){if(fx.unlockRegion){sndUnlock();}else if(sign==='pos'){sndPositive();}else if(sign==='neg'){sndNegative();}else{sndNeutral();}}
+  let outcomeHtml='';
+  if(isBigWin)outcomeHtml+=`<div style="color:#ffff33;font-size:12px;letter-spacing:1px;margin-bottom:8px">⚡ AGAINST THE ODDS — THE GAMBLE PAID OFF!</div>`;
+  outcomeHtml+=`<div style="margin-bottom:4px">${choice.out||'Result applied.'}</div>`;
+  if(specialNote)outcomeHtml+=`<div style="color:#ffaa00;font-size:11px;margin-top:6px;border-top:1px solid #1a4a1a;padding-top:6px">⚠ ${specialNote}</div>`;
+  document.getElementById('oc-text').innerHTML=outcomeHtml;
   let html='';
-  if(fx.popMult!=null)html+=`<div><span class="${sign}">POPULATION NOW: ${fmtPop(GS.pop)}</span></div>`;
+  // Selection-by-survival explanation + bell curve: this is where the player
+  // SEES natural selection happen, rather than just being told a number.
+  if(selInfo){
+    const s=STAT_DEFS.find(x=>x.id===selInfo.statKey);
+    const label=s?s.label:selInfo.statKey;
+    const before=selInfo.meanBefore, after=clamp(before+selInfo.meanShift,1,10);
+    const survivedPct=Math.round((1-selInfo.mortality)*100);
+    html+=`<div style="border-bottom:1px solid #1a4a1a;padding-bottom:8px;margin-bottom:8px">
+      <div style="color:#ffaa00;font-size:11px;margin-bottom:4px">SELECTION AT WORK — ${label.toUpperCase()}</div>
+      <div style="font-size:11px;color:#ccffcc;margin-bottom:5px">${survivedPct}% survived. The low end of the population died — the survivors' average ${label.toLowerCase()} is higher than the population as a whole started with.</div>
+      <div>${bellCurveSVG(before,selInfo.newSpread,180,42,1-selInfo.mortality)}</div>
+      <div style="font-size:10px;color:#88ff88;margin-top:2px">Mean ${label}: ${before.toFixed(1)} → <span class="pos">${after.toFixed(1)}</span> &nbsp;·&nbsp; Diversity narrowed (bottleneck)</div>
+      ${selInfo.attenuationNote?`<div style="font-size:10px;color:#ffff33;margin-top:5px">⚡ ${selInfo.attenuationNote}</div>`:''}
+      ${selInfo.championText?`<div style="font-size:10px;color:#ffcc44;margin-top:5px">${selInfo.championText}</div>`:''}
+    </div>`;
+  }
+  if(fx.popMult!=null){
+    const delta=GS.pop-(popBefore??GS.pop);
+    const deltaSign=delta>=0?'pos':'neg';
+    const prefix=delta>=0?'+':'-';
+    html+=`<div><span class="${deltaSign}">POPULATION ${prefix}${fmtPop(Math.abs(delta))} (now ${fmtPop(GS.pop)})</span></div>`;
+  }
   if(fx.terrBonus)html+=`<div><span class="pos">TERRITORY: +${fx.terrBonus}%</span></div>`;
   if(fx.unlockRegion)html+=`<div><span class="pos">REGION UNLOCKED: ${REGION[fx.unlockRegion]?.name||fx.unlockRegion}</span></div>`;
   if(fx.statDeltas){
@@ -1933,8 +2434,156 @@ function showOutcomeOverlay(choice,fx,evTitle,evCat){
 }
 function dismissOutcome(){
   document.getElementById('outcome-overlay').classList.remove('open');
-  nextTurn();
+  updateHUD(); // bars animate to post-choice values now visible to player
+  const ev=GS.currentEvent;
+  const mcq=ev&&MCQ_BANK[ev.id];
+  if(mcq&&!GS.mcqAsked.has(ev.id)){
+    GS.mcqAsked.add(ev.id);
+    setTimeout(()=>openMCQ(mcq),750);
+  } else {
+    setTimeout(nextTurn,750);
+  }
 }
+
+// ── EMBEDDED BIOLOGY MCQ ──
+function openMCQ(mcq){
+  GS.currentMCQ=mcq;
+  document.getElementById('mcq-topic').textContent=mcq.topic;
+  document.getElementById('mcq-q').textContent=mcq.q;
+  document.getElementById('mcq-result').textContent='';
+  document.getElementById('mcq-cont').style.display='none';
+  document.getElementById('mcq-opts').innerHTML=mcq.options.map((o,i)=>
+    `<div class="opt" onclick="answerMCQ(${i})">${o}</div>`).join('');
+  document.getElementById('mcq-overlay').classList.add('open');
+}
+function answerMCQ(idx){
+  const mcq=GS.currentMCQ;
+  document.querySelectorAll('#mcq-opts .opt').forEach(el=>el.onclick=null);
+  const correct=idx===mcq.correct;
+  let bonusMsg='';
+  if(correct){
+    sndPositive();
+    if(mcq.bonusStat){
+      adjStat(mcq.bonusStat,0.3);
+      bonusMsg=` <span class="pos">+0.3 ${STAT_DEFS.find(s=>s.id===mcq.bonusStat)?.label||mcq.bonusStat} bonus!</span>`;
+    }
+  } else {
+    sndNegative();
+  }
+  document.getElementById('mcq-result').innerHTML=
+    `<span class="${correct?'pos':'neg'}">${correct?'✓ CORRECT':'✗ NOT QUITE'}</span>${bonusMsg}<br>${mcq.explain}`;
+  document.getElementById('mcq-cont').style.display='inline-block';
+  animateStatSidebar();
+}
+function closeMCQ(){
+  document.getElementById('mcq-overlay').classList.remove('open');
+  setTimeout(nextTurn,300);
+}
+
+// ═══════════════════════════════════════════════════════
+//  RETRO SOUND ENGINE
+// ═══════════════════════════════════════════════════════
+let _ac=null;
+function _getAC(){
+  if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();
+  if(_ac.state==='suspended')_ac.resume();
+  return _ac;
+}
+function _note(ac,f,t,d,v,type,slide){
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.connect(g);g.connect(ac.destination);
+  o.type=type||'square';
+  o.frequency.setValueAtTime(f,ac.currentTime+t);
+  if(slide!=null)o.frequency.linearRampToValueAtTime(slide,ac.currentTime+t+d);
+  g.gain.setValueAtTime(v,ac.currentTime+t);
+  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+t+d);
+  o.start(ac.currentTime+t);
+  o.stop(ac.currentTime+t+d+0.05);
+}
+function _play(notes){
+  try{const ac=_getAC();notes.forEach(n=>_note(ac,n[0],n[1]||0,n[2]||0.1,n[3]||0.25,n[4]||'square',n[5]));}
+  catch(e){}
+}
+
+// ── sound vocabulary ──
+function sndJump(){_play([[300,0,0.06,0.18],[500,0.05,0.08,0.12]])}
+function sndHit(){_play([[200,0,0.05,0.3,'sawtooth',80],[90,0.04,0.18,0.28,'square']])}
+function sndHop(){_play([[180,0,0.04,0.18,'square',340]])}
+function sndLandSlot(){_play([[660,0,0.06,0.22,'triangle'],[880,0.07,0.1,0.18,'triangle']])}
+function sndSplash(){_play([[160,0,0.12,0.3,'sawtooth',55],[80,0.06,0.18,0.22,'square']])}
+function sndTick(){_play([[1200,0,0.03,0.08,'square']])}
+function sndTimingSuccess(){_play([[523,0,0.08,0.25,'triangle'],[659,0.09,0.08,0.25,'triangle'],[784,0.18,0.1,0.25,'triangle'],[1047,0.28,0.22,0.3,'triangle']])}
+function sndTimingFail(){_play([[300,0,0.12,0.3,'sawtooth',220],[180,0.14,0.22,0.28,'sawtooth',100]])}
+function sndPositive(){_play([[523,0,0.09,0.22,'triangle'],[659,0.1,0.09,0.22,'triangle'],[784,0.2,0.12,0.22,'triangle'],[1047,0.32,0.22,0.25,'triangle']])}
+function sndNegative(){_play([[330,0,0.13,0.28,'square'],[277,0.14,0.13,0.26,'square'],[220,0.28,0.18,0.24,'square'],[165,0.46,0.28,0.22,'square']])}
+function sndNeutral(){_play([[440,0,0.08,0.18,'triangle'],[440,0.1,0.08,0.14,'triangle']])}
+function sndDramatic(){_play([[110,0,0.06,0.35,'sawtooth'],[110,0.08,0.06,0.35,'sawtooth'],[110,0.16,0.06,0.35,'sawtooth'],[146,0.24,0.35,0.4,'sawtooth',75]])}
+function sndUnlock(){_play([[784,0,0.08,0.28,'triangle'],[988,0.1,0.08,0.28,'triangle'],[1175,0.2,0.08,0.28,'triangle'],[1568,0.3,0.3,0.35,'triangle']])}
+function sndClick(){_play([[660,0,0.04,0.1,'square']])}
+function sndRunnerLevelUp(){_play([[440,0,0.05,0.15,'square'],[660,0.06,0.05,0.15,'square'],[880,0.12,0.1,0.15,'square']])}
+function sndAllFull(){_play([[523,0,0.07,0.28,'triangle'],[659,0.08,0.07,0.28,'triangle'],[784,0.16,0.07,0.28,'triangle'],[1047,0.24,0.07,0.28,'triangle'],[1319,0.32,0.3,0.35,'triangle']])}
+function sndVictory(){
+  [[523,0],[659,0.1],[784,0.2],[1047,0.3],[784,0.42],[1047,0.52],[1047,0.62],[1175,0.72],[1047,0.84]]
+  .forEach(([f,t])=>_note(_getAC(),f,t,0.09,0.28,'triangle'));
+}
+function sndExtinction(){
+  [[330,0,0.2,0.32,'sawtooth'],[277,0.22,0.2,0.3,'sawtooth'],[233,0.44,0.2,0.28,'sawtooth'],[196,0.66,0.35,0.28,'sawtooth'],[165,1.02,0.6,0.3,'sawtooth',80]]
+  .forEach(n=>_play([n]));
+}
+function sndEquilibrium(){_play([[523,0,0.1,0.22,'triangle'],[523,0.12,0.1,0.18,'triangle'],[392,0.26,0.25,0.25,'triangle']])}
+function sndGameStart(){_play([[262,0,0.07,0.2,'square'],[330,0.08,0.07,0.2,'square'],[392,0.16,0.07,0.2,'square'],[523,0.24,0.18,0.28,'square']])}
+
+let _titleLoopActive=false,_titleLoopTimer=null,_titleNodes=[];
+function _titleNote(ac,f,t,d,v,type){
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.connect(g);g.connect(ac.destination);
+  o.type=type||'square';
+  o.frequency.setValueAtTime(f,ac.currentTime+t);
+  g.gain.setValueAtTime(v,ac.currentTime+t);
+  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+t+d);
+  o.start(ac.currentTime+t);
+  o.stop(ac.currentTime+t+d+0.05);
+  _titleNodes.push(o);
+}
+function sndTitleStart(){if(_titleLoopActive)return;_titleLoopActive=true;_titleLoopTick();}
+function sndTitleStop(){
+  _titleLoopActive=false;clearTimeout(_titleLoopTimer);
+  _titleNodes.forEach(o=>{try{o.stop()}catch(e){}});
+  _titleNodes=[];
+}
+function _titleLoopTick(){
+  if(!_titleLoopActive)return;
+  try{
+    const ac=_getAC();
+    if(ac.state==='suspended'){_titleLoopTimer=setTimeout(_titleLoopTick,200);return;}
+    _titleNodes=[]; // only ever track the current bar so stop() is instant
+    const b=0.18; // 8th-note at ~165bpm
+    // melody — C major pentatonic adventure loop
+    [[523,0],[659,1],[784,2],[880,3],[1047,4],[880,5],[784,6],[659,7],
+     [523,8],[659,9],[523,10],[659,11],[784,12],[659,13],[523,14],[440,15],
+     [392,16],[440,17],[523,18],[659,19],[784,20],[880,21],[1047,22],[880,23],
+     [784,24],[659,25],[523,26],[440,27],[523,28],[659,29],[784,30],[784,31]]
+    .forEach(([f,t])=>_titleNote(ac,f,t*b,b*0.78,0.14,'square'));
+    // bass
+    [[131,0],[131,8],[165,16],[131,24]].forEach(([f,t])=>_titleNote(ac,f,t*b,b*3.5,0.09,'triangle'));
+    _titleLoopTimer=setTimeout(_titleLoopTick,(32*b-0.05)*1000);
+  }catch(e){}
+}
+// Browsers block audio until the first user gesture — so arm the theme to start
+// on the first click/keypress/tap anywhere, then remove the listeners.
+function _armTitleAudio(){
+  const kick=()=>{
+    _getAC();
+    if(!document.getElementById('screen-game').classList.contains('active'))sndTitleStart();
+    window.removeEventListener('pointerdown',kick,true);
+    window.removeEventListener('keydown',kick,true);
+    window.removeEventListener('touchstart',kick,true);
+  };
+  window.addEventListener('pointerdown',kick,true);
+  window.addEventListener('keydown',kick,true);
+  window.addEventListener('touchstart',kick,true);
+}
+_armTitleAudio();
 
 // ═══════════════════════════════════════════════════════
 //  FULLSCREEN
@@ -2080,6 +2729,7 @@ function frRespawn(){
 
 function frDrown(){
   if(frRab.drowning)return;
+  sndSplash();
   frRab.drowning=true; frRab.drownT=55;
   frLives--; frUpdateLivesHUD();
   if(frLives<=0){setTimeout(frEndGame,900);}else{setTimeout(frRespawn,900);}
@@ -2095,12 +2745,14 @@ function frTryMove(dc,dr){
   if(newRow===FR_ROW_DEST){newCol=Math.round(newCol);if(!FR_DEST_COLS.includes(newCol))return;}
   if(newCol<0||newCol>=FR_COLS)return;
   frRab.floatCol=newCol; frRab.row=newRow;
+  sndHop();
   if(frRab.row===FR_ROW_DEST){
     const idx=FR_DEST_COLS.indexOf(Math.round(frRab.floatCol));
     if(idx!==-1){
       frSlots[idx]=true; frUpdateSlotHUD();
       frRab.alive=false;
       if(frSlots.every(Boolean)){frEndGame();return;}
+      sndLandSlot();
       setTimeout(frRespawn,350);
     }
   }
@@ -2243,10 +2895,11 @@ function frEndGame(){
 
   const sign=change>=0?'+':'';
   const outcomeText=`${landed}/6 rabbits crossed the river. ${row.desc}. Population ${sign}${fmtPop(Math.abs(change))}.`;
-  showOutcomeOverlay({out:outcomeText},{},`RIVER CROSSING — ${landed}/6 SLOTS`,'GAMBLE EVENT');
+  if(landed===6){sndAllFull();}else if(change>0){sndPositive();}else if(change<0){sndNegative();}else{sndNeutral();}
+  showOutcomeOverlay({out:outcomeText},{popMult:change>=0?1.5:0.5,_noSound:true},`RIVER CROSSING — ${landed}/6 SLOTS`,'GAMBLE EVENT');
 }
 
-function restart(){GS=newGS();showScreen('title')}
+function restart(){GS=newGS();showScreen('title');sndTitleStart();}
 </script>
 </body>
 </html>
