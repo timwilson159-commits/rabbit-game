@@ -202,6 +202,12 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 #expand-opts .opt{max-width:440px}
 #mcq-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 #mcq-overlay.open{display:flex}
+#mcq-opts .opt.mcq-answered{cursor:default}
+#mcq-opts .opt.mcq-dim{opacity:.38}
+#mcq-opts .opt.mcq-correct{border-color:#33ff33;background:#0a2e0a;color:#ccffcc}
+#mcq-opts .opt.mcq-wrong{border-color:#ff5522;background:#2e0a0a;color:#ffcccc}
+.mcq-mark{font-weight:bold;margin-right:6px}
+#mcq-anyhint{display:none;font-size:11px;letter-spacing:2px;color:#88ff88;text-align:center;margin-top:14px}
 #gamble-overlay.open{display:flex}
 .gamble-panel{border:2px solid #33ff33;background:#030a03;padding:22px 26px;max-width:480px;width:90%}
 .gamble-title{font-size:14px;letter-spacing:3px;color:#fff;text-shadow:0 0 10px #33ff33;text-align:center;margin-bottom:4px}
@@ -443,7 +449,7 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
     <div id="mcq-q" style="color:#fff;font-size:14px;margin:10px 0 14px;line-height:1.5"></div>
     <div id="mcq-opts"></div>
     <div id="mcq-result" style="font-size:12px;margin-top:10px;line-height:1.6"></div>
-    <button id="mcq-cont" style="display:none;margin:12px auto 0;background:transparent;border:2px solid #33ff33;color:#33ff33;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;padding:9px 22px;cursor:pointer" onclick="closeMCQ()">[ CONTINUE ]</button>
+    <div id="mcq-anyhint" class="blink">[ CLICK ANYWHERE OR PRESS ANY KEY TO CONTINUE ]</div>
   </div>
 </div>
 
@@ -945,21 +951,46 @@ const STAT_DEFS=[
 
 const MAX_SEASONS=30;
 
-// Native species tracked for ecological-impact reporting. threshold = the
-// nativeImpact value (0-100) at which that species is driven locally extinct.
-// Loss is PERMANENT — a species doesn't come back even if impact later falls.
+// Native species tracked for ecological impact. threshold = the nativeImpact
+// (0-100) a species can tolerate. Extinction is NOT instant: your impact must
+// stay above a species' threshold for NATIVE_EXTINCT_DELAY consecutive seasons
+// (a war of attrition). If impact drops, the pressure eases and they recover.
+// Loss, once it happens, is permanent.
+const NATIVE_EXTINCT_DELAY=3;
 const NATIVES=[
-  {id:'bilby',      name:'Greater Bilby',        threshold:30},
-  {id:'bettong',    name:'Burrowing Bettong',     threshold:45},
-  {id:'bandicoot',  name:'Barred Bandicoot',      threshold:58},
-  {id:'quoll',      name:'Western Quoll',         threshold:72},
-  {id:'malleefowl', name:'Malleefowl',            threshold:86},
+  {id:'bilby',      name:'Greater Bilby',        threshold:40},
+  {id:'bettong',    name:'Burrowing Bettong',     threshold:55},
+  {id:'bandicoot',  name:'Barred Bandicoot',      threshold:68},
+  {id:'quoll',      name:'Western Quoll',         threshold:80},
+  {id:'malleefowl', name:'Malleefowl',            threshold:92},
 ];
-function updateNativeImpact(){
-  const popFactor=Math.min(60,Math.log10(Math.max(10,GS.pop))/Math.log10(1e8)*60);
+// Impact from population is now much gentler: essentially zero until you pass
+// ~10,000 rabbits, then ramps to full only at a continent-scale 100M — so small
+// colonies no longer wipe natives, and it takes a genuinely huge invasion to
+// threaten the hardiest species.
+function currentNativeImpact(){
+  const popFactor=Math.max(0,Math.min(60,(Math.log10(Math.max(10,GS.pop))-4)/4*60));
   const terrFactor=Math.min(40,GS.territory*0.4);
-  GS.nativeImpact=Math.min(100,popFactor+terrFactor);
-  NATIVES.forEach(n=>{if(GS.nativeImpact>=n.threshold)GS.nativesLost.add(n.id)});
+  return Math.min(100,popFactor+terrFactor);
+}
+function updateNativeImpact(){ GS.nativeImpact=currentNativeImpact(); } // display only — no accumulation
+// Called ONCE per season (from baseGrowth) so pressure accrues per-season, not
+// per HUD refresh. Sustained pressure kills; relief lets threatened species claw back.
+function advanceNativePressure(){
+  const impact=currentNativeImpact();
+  GS.nativeImpact=impact;
+  NATIVES.forEach(n=>{
+    if(GS.nativesLost.has(n.id))return;
+    if(impact>=n.threshold){
+      GS.nativePressure[n.id]=(GS.nativePressure[n.id]||0)+1;
+      if(GS.nativePressure[n.id]>=NATIVE_EXTINCT_DELAY){
+        GS.nativesLost.add(n.id);
+        delete GS.nativePressure[n.id];
+      }
+    } else {
+      GS.nativePressure[n.id]=Math.max(0,(GS.nativePressure[n.id]||0)-1);
+    }
+  });
 }
 function ecoCostLabel(n){
   if(n===0)return'MINIMAL';
@@ -1506,6 +1537,7 @@ function newGS(){
     regionEntry:{}, // regionId -> {turn, pop} at the moment it was first settled — drives gradual coverage growth
     nativeImpact:0, // 0-100, rises as population/territory grow — see NATIVES
     nativesLost:new Set(), // extinctions are permanent even if impact later "improves"
+    nativePressure:{}, // id -> consecutive seasons impact has been above that species' threshold
     lineageName:'',
     setup:{loc:null,pop:null,repro:null,boosts:[]},
     log:[], history:[],// [{season,pop,territory,event}]
@@ -1737,8 +1769,10 @@ function updateHUD(){
   impf.className='bfill impact'+(GS.nativeImpact>=70?' crit':GS.nativeImpact>=40?' warn':'');
   document.getElementById('v-impact').textContent=Math.round(GS.nativeImpact)+'%';
   document.getElementById('native-list').innerHTML=NATIVES.map(n=>{
-    const lost=GS.nativesLost.has(n.id);
-    return`<span style="color:${lost?'#ff4444':'#88aaff'}">${n.name}: ${lost?'EXTINCT':'ok'}</span>`;
+    if(GS.nativesLost.has(n.id))return`<span style="color:#ff4444">${n.name}: EXTINCT</span>`;
+    const threat=GS.nativePressure[n.id]||0;
+    if(threat>0)return`<span style="color:#ffaa33">${n.name}: THREATENED (${threat}/${NATIVE_EXTINCT_DELAY})</span>`;
+    return`<span style="color:#88aaff">${n.name}: ok</span>`;
   }).join(' &nbsp;·&nbsp; ');
 }
 function updateIslandWarn(){
@@ -1839,6 +1873,8 @@ function baseGrowth(){
   }
   // Density check
   checkDensity();
+  // Native species pressure — one attrition tick per season
+  advanceNativePressure();
   // Stasis
   const delta=Math.abs(GS.pop-GS.prevPop)/(GS.prevPop||1);
   GS.stasisTurns=delta<0.012?GS.stasisTurns+1:0;
@@ -1923,9 +1959,11 @@ function continueTurnFlow(){
     setTimeout(()=>openGambleSetup(),400);
     return;
   }
-  // Check evolution event
-  if(GS.turn===GS.nextEvolSeason){
-    GS.nextEvolSeason+=5;
+  // Check evolution event. Use >= (not ===) so that if another special event
+  // (river crossing) claimed this exact turn, the runner still fires next turn
+  // instead of being skipped for the rest of the game.
+  if(GS.turn>=GS.nextEvolSeason){
+    GS.nextEvolSeason=GS.turn+5;
     setTimeout(()=>openRunner(),400);
     return;
   }
@@ -2317,8 +2355,9 @@ function openTiming(island){
   timingActive=true;
   GS.timingResult=null;
   const barW=500;
-  // Tasmania wider zone, islands much narrower
-  const zoneW={T:56,L:26,F:23}[island]||30;
+  // Tasmania wider zone, islands much narrower. (Zones are 20% smaller than
+  // before, but success now counts any overlap with the zone — see doTimingStop.)
+  const zoneW={T:45,L:21,F:18}[island]||24;
   timingZoneW=zoneW;
   timingZoneL=Math.floor(barW/2-zoneW/2);
   const zone=document.getElementById('timing-zone');
@@ -2356,7 +2395,9 @@ function doTimingStop(){
   cancelAnimationFrame(timingAnim);
   window.removeEventListener('keydown',timingKey);
   document.getElementById('timing-track').removeEventListener('click',doTimingStop);
-  const success=timingPos>=timingZoneL&&timingPos<=(timingZoneL+timingZoneW-14);
+  // Success = the 14px bar OVERLAPS the green zone at all (any part touching),
+  // rather than needing to be fully inside it — much more forgiving.
+  const success=timingPos+14>=timingZoneL&&timingPos<=(timingZoneL+timingZoneW);
   const resEl=document.getElementById('timing-result');
   if(success){
     sndTimingSuccess();
@@ -2679,10 +2720,10 @@ function calcScore(endType){
 }
 function scoreRank(total){
   if(total>=90)return{grade:'S',title:'APEX INVADER'};
-  if(total>=75)return{grade:'A',title:'PLAGUE PROPORTIONS'};
-  if(total>=60)return{grade:'B',title:'ESTABLISHED PEST'};
-  if(total>=40)return{grade:'C',title:'FOOTHOLD GAINED'};
-  if(total>=20)return{grade:'D',title:'STRUGGLING COLONY'};
+  if(total>=80)return{grade:'A',title:'PLAGUE PROPORTIONS'};
+  if(total>=66)return{grade:'B',title:'ESTABLISHED PEST'};
+  if(total>=46)return{grade:'C',title:'FOOTHOLD GAINED'};
+  if(total>=24)return{grade:'D',title:'STRUGGLING COLONY'};
   return{grade:'F',title:'FAILED INVASION'};
 }
 
@@ -2850,15 +2891,28 @@ function openMCQ(mcq){
   else{defEl.style.display='none';}
   document.getElementById('mcq-q').textContent=mcq.q;
   document.getElementById('mcq-result').textContent='';
-  document.getElementById('mcq-cont').style.display='none';
+  document.getElementById('mcq-anyhint').style.display='none';
   document.getElementById('mcq-opts').innerHTML=mcq.options.map((o,i)=>
     `<div class="opt" onclick="answerMCQ(${i})">${o}</div>`).join('');
   document.getElementById('mcq-overlay').classList.add('open');
 }
+let _mcqDismiss=null;
 function answerMCQ(idx){
   const mcq=GS.currentMCQ;
-  document.querySelectorAll('#mcq-opts .opt').forEach(el=>el.onclick=null);
+  const opts=document.querySelectorAll('#mcq-opts .opt');
+  if(!opts.length||opts[0].classList.contains('mcq-answered'))return; // already answered — ignore
   const correct=idx===mcq.correct;
+  // Lock all options, dim them, then light up the correct one (green ✓) and,
+  // if the player was wrong, their pick (red ✗) so they can see both.
+  opts.forEach(el=>{el.onclick=null;el.classList.add('mcq-answered','mcq-dim');});
+  opts[mcq.correct].classList.remove('mcq-dim');
+  opts[mcq.correct].classList.add('mcq-correct');
+  opts[mcq.correct].insertAdjacentHTML('afterbegin','<span class="mcq-mark">✓</span>');
+  if(!correct){
+    opts[idx].classList.remove('mcq-dim');
+    opts[idx].classList.add('mcq-wrong');
+    opts[idx].insertAdjacentHTML('afterbegin','<span class="mcq-mark">✗</span>');
+  }
   let bonusMsg='';
   if(correct){
     sndPositive();
@@ -2871,10 +2925,24 @@ function answerMCQ(idx){
   }
   document.getElementById('mcq-result').innerHTML=
     `<span class="${correct?'pos':'neg'}">${correct?'✓ CORRECT':'✗ NOT QUITE'}</span>${bonusMsg}<br>${mcq.explain}`;
-  document.getElementById('mcq-cont').style.display='inline-block';
   animateStatSidebar();
+  document.getElementById('mcq-anyhint').style.display='block';
+  // Arm "click/press anywhere to continue" — delayed slightly so the click that
+  // just picked the answer doesn't instantly dismiss the explanation.
+  _mcqDismiss=function(){closeMCQ();};
+  setTimeout(function(){
+    if(_mcqDismiss){
+      window.addEventListener('keydown',_mcqDismiss,true);
+      window.addEventListener('pointerdown',_mcqDismiss,true);
+    }
+  },140);
 }
 function closeMCQ(){
+  if(_mcqDismiss){
+    window.removeEventListener('keydown',_mcqDismiss,true);
+    window.removeEventListener('pointerdown',_mcqDismiss,true);
+    _mcqDismiss=null;
+  }
   document.getElementById('mcq-overlay').classList.remove('open');
   setTimeout(nextTurn,300);
 }
