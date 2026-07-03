@@ -1068,6 +1068,24 @@ const MCQ_BANK={
     correct:3,bonusStat:'foodFinding',
     explain:'Competition between living species is a BIOTIC factor. When two species compete for the same limited resources, the less successful competitor\'s population tends to decrease — part of why rabbits are so damaging to Australia\'s native wildlife.'},
 
+  // Positive-impact factors — deliberately have an INCREASE answer so students
+  // learn that abiotic AND biotic factors can help a population, not only harm it.
+  golden_season:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'Weeks of warm sunshine and steady, moderate rainfall drive lush plant growth, and the colony thrives on the extra food. Is "sunlight and rainfall driving plant growth" abiotic or biotic, and what effect does it have on the rabbit population here?',
+    options:['Biotic factor — likely to increase the population','Abiotic factor — likely to increase the population','Abiotic factor — likely to decrease the population','Biotic factor — likely to decrease the population'],
+    correct:1,bonusStat:'foodFinding',
+    explain:'Sunlight and water are non-living, so these are ABIOTIC factors. Abiotic factors are not always harmful — favourable conditions grow more plants (more food), which INCREASES the population. Abiotic factors can push a population either way.'},
+  clover_pact:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'Rabbits spread clover seed while the nitrogen-fixing clover enriches the soil and feeds them — each species helps the other. Is this clover relationship abiotic or biotic, and what effect does it have on the rabbit population?',
+    options:['Abiotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Biotic factor — likely to increase the population','Abiotic factor — likely to decrease the population'],
+    correct:2,bonusStat:'foodFinding',
+    explain:'Clover is a living organism, so this is a BIOTIC factor. When two species BOTH benefit it is called MUTUALISM (a type of symbiosis). Beneficial biotic interactions can INCREASE a population — biotic factors are not only predators and disease.'},
+  predator_plague:{topic:'ABIOTIC OR BIOTIC?', def:AB_DEF,
+    q:'A disease wipes out most of the local foxes, and with the predators gone the rabbit numbers surge. Is "the loss of a predator" an abiotic or biotic factor for the rabbits, and what effect does it have on their population?',
+    options:['Abiotic factor — likely to increase the population','Biotic factor — likely to increase the population','Biotic factor — likely to decrease the population','Abiotic factor — likely to decrease the population'],
+    correct:1,bonusStat:'predatorDefense',
+    explain:'Foxes are living organisms, so predation — and its removal — is a BIOTIC factor. Removing a predator releases the prey population to grow, so this biotic change INCREASES the rabbit population. (The catch: with no predators hunting them, selection for predator defence relaxes.)'},
+
   // ── SELECTION & GENETICS CONCEPTS ──
   myxomatosis:{topic:'NATURAL SELECTION',
     def:'KEY TERM — Natural selection: individuals with helpful traits are more likely to survive and reproduce, so those traits become more common in the next generation.',
@@ -1165,6 +1183,56 @@ const EVENTS=[
     {text:'Use the season to expand territory — scout while food is plentiful',
      out:'Migration parties push into new regions while risk of starvation is zero.',
      fx:{popMult:1.7,statDeltas:{migrationSpeed:2,bravery:1},terrBonus:6}},
+   ]},
+
+  // ── POSITIVE-IMPACT EVENTS ──
+  // Selective pressure isn't only threats: favourable ABIOTIC conditions and
+  // beneficial BIOTIC relationships can grow a population too. Kept deliberately
+  // modest (no runaway multipliers) and paired with trade-offs so they add
+  // learning + variety without unbalancing the anti-exploit tuning.
+  {id:'golden_season',phase:'any',cat:'ABIOTIC EVENT',sprite:'sun',cyclic:true,
+   title:'THE LONG GOLDEN SEASON',
+   body:'Not a dramatic boom — just a run of near-perfect weather. Weeks of warm sunshine and gentle, steady rainfall push the grasses and herbs into thick, nutritious growth. There is good feed everywhere, and it lasts.',
+   choices:[
+    {text:'Graze the rich pasture widely — let the colony feed and grow',
+     out:'Well-fed does raise healthy, frequent litters. Numbers climb steadily on the abundant plant growth.',
+     fx:{popMult:1.6,statDeltas:{foodFinding:1,litterSize:.5}}},
+    {text:'Pour the surplus into raising strong, healthy kits',
+     out:'Superb nutrition produces bigger, hardier young. Growth is solid and the colony is in peak condition.',
+     fx:{popMult:1.45,statDeltas:{size:1,diseaseResistance:1}}},
+    {text:'Use the plentiful feed to scout and settle new ground',
+     out:'With starvation off the table, exploring parties range far and establish fresh footholds.',
+     fx:{popMult:1.3,statDeltas:{migrationSpeed:1,foodFinding:.5},terrBonus:5}},
+   ]},
+
+  {id:'clover_pact',phase:'any',cat:'BIOTIC EVENT',sprite:'clover',cyclic:true,
+   title:'THE CLOVER PACT',
+   body:'Your droppings scatter clover seed across the range, and the clover repays the favour: as a legume it fixes nitrogen back into the soil, so everywhere it spreads the pasture grows richer and greener. Rabbit and plant are quietly helping each other — a mutualism.',
+   choices:[
+    {text:'Feed on the nitrogen-rich clover swards',
+     out:'The protein-packed clover lifts condition and fertility. A living partnership strengthens the whole colony.',
+     fx:{popMult:1.5,statDeltas:{foodFinding:1,droughtResistance:.5}}},
+    {text:'Range further, spreading clover seed as you go',
+     out:'The mutualism travels with you — new country greens up behind the colony as it expands.',
+     fx:{popMult:1.25,statDeltas:{migrationSpeed:1,foodFinding:.5},terrBonus:5}},
+    {text:'Strip the clover hard for one fast, heavy feed',
+     out:'A short-term feast — but overgrazing sets the clover back and weakens the partnership. Numbers jump now; the pasture will pay for it later.',
+     fx:{popMult:1.8,statDeltas:{foodFinding:-1,droughtResistance:-.5}}},
+   ]},
+
+  {id:'predator_plague',phase:'mid',cat:'BIOTIC EVENT',sprite:'fox',cyclic:true,
+   title:'PLAGUE AMONG THE HUNTERS',
+   body:'Sarcoptic mange tears through the fox population. Sick, weakened foxes vanish from the paddocks and the nightly toll on your warrens collapses. For a while at least, the hunters are gone — a biotic factor working entirely in your favour.',
+   choices:[
+    {text:'Seize the reprieve — breed hard and spread into the safer ground',
+     out:'Freed from predators, the colony booms and pushes outward. But with nothing hunting them, the cautious edge begins to soften.',
+     fx:{popMult:1.7,statDeltas:{predatorDefense:-1,bravery:.5},terrBonus:4}},
+    {text:'Grow, but keep the warren wary and well-defended',
+     out:'A measured expansion. Vigilance is maintained, so when the foxes recover the colony will still be ready.',
+     fx:{popMult:1.4,statDeltas:{predatorDefense:.5}}},
+    {text:'Reclaim the old fox strongholds you never dared enter',
+     out:'Ground once too dangerous to hold falls to the colony while the predators are down.',
+     fx:{popMult:1.3,statDeltas:{migrationSpeed:1,bravery:1},terrBonus:6}},
    ]},
 
   {id:'first_drought',phase:'early',cat:'ABIOTIC EVENT',sprite:'sun',
