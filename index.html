@@ -992,11 +992,13 @@ function advanceNativePressure(){
     }
   });
 }
-function ecoCostLabel(n){
-  if(n===0)return'MINIMAL';
-  if(n===1)return'MODERATE';
-  if(n<=3)return'SEVERE';
-  return'CATASTROPHIC';
+// Qualitative label for how many native species the invasion has displaced.
+function ecoDominanceLabel(n){
+  if(n===0)return'NONE — natives holding on';
+  if(n===1)return'MINOR';
+  if(n<=3)return'MAJOR';
+  if(n<5)return'SEVERE';
+  return'TOTAL — every tracked species displaced';
 }
 
 // Named champions — the first individual whose trait crosses "exceptional"
@@ -2743,19 +2745,22 @@ function calcScore(endType){
   const genScore=Math.round((avgStat/10)*25);
   // Survival /10 — reached S30 alive = 10, equilibrium = 5, extinction = 0
   const survScore=endType==='extinction'?0:endType==='stasis'?5:10;
-  // Ecological Cost — a real penalty for native species driven extinct.
-  // This is what makes the S-rank "win" morally loaded: success here IS the invasion.
-  const ecoCost=GS.nativesLost.size*4;
-  const rawTotal=popScore+terrScore+islandScore+genScore+survScore;
-  const total=Math.max(0,Math.min(100,rawTotal-ecoCost));
-  return{total,popScore,terrScore,islandScore,genScore,survScore,ecoCost,nativesLostCount:GS.nativesLost.size};
+  // Ecological Dominance — a BONUS for displacing native species. You're playing
+  // an invasive species; clearing natives is evidence of a thorough takeover.
+  // (+4 per species, up to +20.) The real-world catastrophe is carried by the debrief.
+  const ecoBonus=GS.nativesLost.size*4;
+  const rawTotal=popScore+terrScore+islandScore+genScore+survScore+ecoBonus;
+  const total=Math.max(0,Math.min(100,rawTotal));
+  return{total,popScore,terrScore,islandScore,genScore,survScore,ecoBonus,nativesLostCount:GS.nativesLost.size};
 }
 function scoreRank(total){
-  if(total>=90)return{grade:'S',title:'APEX INVADER'};
-  if(total>=80)return{grade:'A',title:'PLAGUE PROPORTIONS'};
-  if(total>=66)return{grade:'B',title:'ESTABLISHED PEST'};
-  if(total>=46)return{grade:'C',title:'FOOTHOLD GAINED'};
-  if(total>=24)return{grade:'D',title:'STRUGGLING COLONY'};
+  // Re-tuned for the Ecological Dominance bonus (up to +20): a complete,
+  // dominant run now reaches S, while a random clickthrough still lands ~C.
+  if(total>=92)return{grade:'S',title:'APEX INVADER'};
+  if(total>=82)return{grade:'A',title:'PLAGUE PROPORTIONS'};
+  if(total>=70)return{grade:'B',title:'ESTABLISHED PEST'};
+  if(total>=50)return{grade:'C',title:'FOOTHOLD GAINED'};
+  if(total>=28)return{grade:'D',title:'STRUGGLING COLONY'};
   return{grade:'F',title:'FAILED INVASION'};
 }
 
@@ -2770,7 +2775,7 @@ function showEnd(type){
   document.getElementById('score-num').textContent=sc.total;
   document.getElementById('score-rank').textContent=`${rank.grade} · ${rank.title}`;
   document.getElementById('score-breakdown').textContent=
-    `Pop: ${sc.popScore}/30 · Territory: ${sc.terrScore}/25 · Genetics: ${sc.genScore}/25 · Islands: ${sc.islandScore}/10 · Survival: ${sc.survScore}/10 · Ecological Cost: -${sc.ecoCost}`;
+    `Pop: ${sc.popScore}/30 · Territory: ${sc.terrScore}/25 · Genetics: ${sc.genScore}/25 · Islands: ${sc.islandScore}/10 · Survival: ${sc.survScore}/10 · Ecological Dominance: +${sc.ecoBonus}`;
   buildGraph();
   const lostNames=NATIVES.filter(n=>GS.nativesLost.has(n.id)).map(n=>n.name);
   document.getElementById('sum-box').innerHTML=[
@@ -2783,7 +2788,7 @@ function showEnd(type){
     ['Breeding Strategy',GS.setup.repro?.label||'—'],
     ['Islands Reached',[...GS.regions].filter(r=>REGION[r]?.boat).map(r=>REGION[r].name).join(', ')||'None'],
     ['Native Species Lost',`${sc.nativesLostCount} of ${NATIVES.length} tracked${lostNames.length?' — '+lostNames.join(', '):''}`],
-    ['Ecological Cost',ecoCostLabel(sc.nativesLostCount)],
+    ['Ecological Dominance',ecoDominanceLabel(sc.nativesLostCount)],
   ].map(([k,v])=>`<div class="sum-row"><span>${k}</span><span>${v}</span></div>`).join('');
   document.getElementById('dec-log').innerHTML=
     GS.log.map(d=>`<div>S${d.season} — <span style="color:#fff">${d.event}:</span> ${d.choice}</div>`).join('')||
@@ -2796,14 +2801,32 @@ function showEnd(type){
   document.getElementById('lesson-box').innerHTML=
     `<div class="lesson-t">ECOLOGICAL DEBRIEF:</div>${d.lesson}`;
   // Compared-to-history: anchors the fiction to the real 1859-2020s invasion.
-  const realMultiple=(1e10/Math.max(GS.pop,1)).toFixed(0);
+  // Tiered so wildly exceeding the historical peak gets its own (funnier) line,
+  // instead of every result >=10B collapsing into "matching the scale".
+  const HIST_PEAK=1e10;
+  let historyLine;
+  if(GS.pop<HIST_PEAK){
+    const realMultiple=(HIST_PEAK/Math.max(GS.pop,1)).toFixed(0);
+    historyLine=`about 1/${realMultiple}th of the real historical peak`;
+  } else {
+    const overMultiple=GS.pop/HIST_PEAK;
+    if(overMultiple<3){
+      historyLine='matching the scale of the real invasion';
+    } else if(overMultiple<20){
+      historyLine=`roughly <strong style="color:#fff">${overMultiple.toFixed(1)}× the real historical peak</strong> — the actual invasion was bad; yours was worse`;
+    } else if(overMultiple<200){
+      historyLine=`about <strong style="color:#fff">${overMultiple.toFixed(0)}× the real historical peak</strong>. Somewhere, a 19th-century pastoralist named Thomas Austin is having second thoughts about "a few rabbits for hunting"`;
+    } else {
+      historyLine=`roughly <strong style="color:#fff">${overMultiple.toLocaleString(undefined,{maximumFractionDigits:0})}× the real historical peak</strong> — at this point you haven't out-bred history, you've broken it. Even the rabbits are asking where all this grass is coming from`;
+    }
+  }
   document.getElementById('history-box').innerHTML=
     `<div class="lesson-t" style="color:#ffaa00">COMPARED TO HISTORY:</div>
      Real wild rabbits released in 1859 reached an estimated <strong style="color:#fff">10 billion</strong> at their peak,
      spread across most of the continent within decades, and still cost Australia an estimated
      <strong style="color:#fff">$200 million a year</strong> in agricultural damage today.
      ${GS.lineageName} reached <strong style="color:#fff">${fmtPop(GS.pop)}</strong> —
-     ${GS.pop<1e10?`about 1/${realMultiple}th of the real historical peak`:'matching the scale of the real invasion'}.`;
+     ${historyLine}.`;
   showScreen('end');
 }
 
