@@ -1,0 +1,46 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Deploy whenever the site changes on the main branch...
+  push:
+    branches: [main]
+  # ...and allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+# Least-privilege permissions the Pages deploy needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Serialise deployments: only one runs at a time and later pushes queue behind
+# the current one instead of colliding.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      # Publish ONLY the site file, not the whole repo. The GitHub Pages backend
+      # can stall during "syncing_files"; keeping the artifact to a single file
+      # (instead of the entire repo incl. the .git folder) minimises that risk.
+      - name: Assemble a clean site folder
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
