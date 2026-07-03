@@ -1351,7 +1351,7 @@ const EVENTS=[
   {id:'boat_tasmania',phase:'late',cat:'HUMAN IMPACT',sprite:'ship',dramatic:true,
    islandTarget:'T',
    title:'CROSSING THE STRAIT',
-   body:'Bass Strait — 240 km of cold rough ocean — separates the mainland from Tasmania. Rabbits have been spotted near Melbourne\'s docks. There are reports of stowaways on wool ships. Tasmania, with no rabbits at all, lies tantalisingly close.',
+   body:'Bass Strait — 240 km of cold rough ocean — separates the mainland from Tasmania. The crossing must be launched from your South Australia colony on wool ships bound for Hobart. Tasmania, with no rabbits at all, lies tantalisingly close. ⚠ HIGH STAKES: if the crossing fails, the entire South Australia colony is lost at sea and the region falls.',
    choices:[
     {text:'Attempt the crossing — stow away on a cargo ship bound for Hobart',
      out:'',/* filled by timing mini-game result */
@@ -1365,7 +1365,7 @@ const EVENTS=[
   {id:'boat_lhi',phase:'late',cat:'HUMAN IMPACT',sprite:'ship',
    islandTarget:'L',
    title:'VOYAGE TO LORD HOWE',
-   body:'Lord Howe Island lies 600 km off the NSW coast. A small population has been spotted near a fishing port. Supply boats make the journey occasionally. The island is pristine, uncolonised, and completely defenceless.',
+   body:'Lord Howe Island lies 600 km off the east coast. The crossing must be launched from your Queensland colony aboard occasional supply boats. The island is pristine, uncolonised, and completely defenceless. ⚠ HIGH STAKES: if the crossing fails, the entire Queensland colony is lost at sea and the region falls.',
    choices:[
     {text:'Board a supply vessel — it\'s a very long shot but the island is undefended',
      out:'',
@@ -1379,7 +1379,7 @@ const EVENTS=[
   {id:'boat_norfolk',phase:'late',cat:'HUMAN IMPACT',sprite:'ship',
    islandTarget:'F',
    title:'NORFOLK ISLAND GAMBIT',
-   body:'Norfolk Island — 1,400 km from Sydney — is one of the most remote inhabited places in the Pacific. Occasional cargo flights and small ships provide the only connections. This is the ultimate test of the Rabbit Republic.',
+   body:'Norfolk Island — 1,400 km out in the Pacific — is one of the most remote inhabited places on Earth. The crossing must be launched from your Queensland colony on rare cargo ships. This is the ultimate test of the Rabbit Republic. ⚠ HIGH STAKES: if the crossing fails, the entire Queensland colony is lost at sea and the region falls.',
    choices:[
     {text:'Attempt the extreme crossing — everything on one roll',
      out:'',
@@ -2350,6 +2350,32 @@ function confirmAlloc(){
 let timingAnim=null, timingPos=0, timingDir=1, timingSpeed=0, timingZoneL=0, timingZoneW=0;
 let timingIsland=null, timingActive=false;
 
+// Each island crossing launches from a mainland "departure state". Victoria &
+// NSW aren't on the map, so the nearest on-map regions stand in: Tasmania from
+// South Australia, Lord Howe & Norfolk from Queensland (the eastern region).
+// A FAILED crossing is catastrophic: the launch state's colony collapses — you
+// lose its share of the population AND the region itself.
+const ISLAND_DEPARTURE={T:'A',L:'Q',F:'Q'};
+function applyFailedCrossing(island){
+  const dep=ISLAND_DEPARTURE[island];
+  const depName=REGION[dep]?.name||'the launch state';
+  const before=GS.pop;
+  if(dep&&GS.regions.includes(dep)){
+    // Lose that state's population share, then lose the territory itself.
+    const total=totalDensityUnits();
+    const share=total>0?Math.min(1,rUnits(dep)*regionCoverageFraction(dep)/total):0.5;
+    GS.pop=Math.max(5,Math.round(GS.pop*(1-share)));
+    GS.regions=GS.regions.filter(x=>x!==dep);
+    delete GS.regionEntry[dep];
+    delete GS.fadingRegions[dep];
+    GS.territory=calcTerritory();
+    return{depName,popLost:before-GS.pop,regionLost:true};
+  }
+  // Don't hold the launch state — still a heavy blow to the whole population.
+  GS.pop=Math.max(5,Math.round(GS.pop*0.55));
+  return{depName,popLost:before-GS.pop,regionLost:false};
+}
+
 function openTiming(island){
   timingIsland=island;
   timingActive=true;
@@ -2410,9 +2436,11 @@ function doTimingStop(){
   } else {
     sndTimingFail();
     GS.timingResult='fail';
-    resEl.innerHTML='<span class="neg">✗ MISSED. The crossing failed. Population lost.</span>';
-    GS.pop=Math.max(5,Math.round(GS.pop*.85));
-    GS.log.push({season:GS.turn,event:GS.currentEvent.title,choice:'[FAILED CROSSING ATTEMPT]'});
+    const pen=applyFailedCrossing(timingIsland);
+    GS.failPenalty=pen;
+    resEl.innerHTML=`<span class="neg">✗ MISSED. The fleet is lost at sea — ${pen.depName} is devastated.</span>`;
+    GS.log.push({season:GS.turn,event:GS.currentEvent.title,choice:`[FAILED CROSSING — ${pen.depName} lost]`});
+    drawMap();
   }
   document.getElementById('timing-cont').style.display='inline-block';
 }
@@ -2421,8 +2449,12 @@ function timingContinue(){
   document.getElementById('timing-overlay').classList.remove('open');
   if(GS.timingResult==='fail'){
     updateHUD();drawMap();animateStatSidebar();
+    const pen=GS.failPenalty||{depName:'the launch state',popLost:0,regionLost:false};
+    const out=`The crossing failed catastrophically. The launch fleet from ${pen.depName} is lost at sea`+
+      (pen.regionLost?`, and the ${pen.depName} colony collapses entirely`:'')+
+      ` — ${fmtPop(pen.popLost)} rabbits gone.`;
     showOutcomeOverlay(
-      {out:'The crossing failed. You lost 15% of the population in the attempt.'},
+      {out},
       {},
       GS.currentEvent?.title||'CROSSING ATTEMPT',
       'HUMAN IMPACT'
