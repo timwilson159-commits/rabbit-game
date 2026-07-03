@@ -345,6 +345,7 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
             <span id="hud-lbl">SEASON 1 OF 30</span>
           </div>
           <div class="brow"><span class="blbl">POPULATION:</span><div class="btrack"><div class="bfill pop" id="b-pop" style="width:0%"></div></div><span class="bval" id="v-pop">0</span></div>
+          <div id="cap-note" style="font-size:9px;color:#ff9955;margin:1px 0 3px;line-height:1.3">⚠ The land strains past 20B rabbits — a resource collapse becomes likely nearing 30B.</div>
           <div class="brow"><span class="blbl">TERRITORY:</span><div class="btrack"><div class="bfill terr" id="b-terr" style="width:0%"></div></div><span class="bval" id="v-terr">0.0%</span></div>
           <div class="brow"><span class="blbl">SEASONS LEFT:</span><div class="btrack"><div class="bfill seas" id="b-seas" style="width:100%"></div></div><span class="bval" id="v-seas">30</span></div>
           <div class="brow"><span class="blbl">NATIVE IMPACT:</span><div class="btrack"><div class="bfill impact" id="b-impact" style="width:0%"></div></div><span class="bval" id="v-impact">0%</span></div>
@@ -486,7 +487,7 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
       <div class="gamble-val" id="go-pop">—</div>
     </div>
     <div class="gamble-sect">
-      <div class="gamble-lbl">RABBITS TO GAMBLE (MAX 50%)</div>
+      <div class="gamble-lbl" id="go-cap-lbl">RABBITS TO GAMBLE (MAX 50%)</div>
       <input type="range" class="gamble-slider" id="go-slider" min="1" max="100" value="10" oninput="onGambleSlider()">
       <div class="gamble-val"><span id="go-amt">—</span> <span style="font-size:12px;color:#88ff88">rabbits</span></div>
     </div>
@@ -511,7 +512,7 @@ Your goal: spread across every habitable zone in Australia. 30 seasons. Every ch
       <div class="gamble-val" id="hm-pop">—</div>
     </div>
     <div class="gamble-sect">
-      <div class="gamble-lbl">RABBITS TO COMMIT (MAX 70%)</div>
+      <div class="gamble-lbl" id="hm-cap-lbl">RABBITS TO COMMIT (MAX 70%)</div>
       <input type="range" class="gamble-slider" id="hm-slider" min="1" max="100" value="30" oninput="onHailMarySlider()">
       <div class="gamble-val"><span id="hm-amt">—</span> <span style="font-size:12px;color:#88ff88">rabbits</span></div>
     </div>
@@ -956,7 +957,7 @@ const MAX_SEASONS=30;
 // stay above a species' threshold for NATIVE_EXTINCT_DELAY consecutive seasons
 // (a war of attrition). If impact drops, the pressure eases and they recover.
 // Loss, once it happens, is permanent.
-const NATIVE_EXTINCT_DELAY=3;
+const NATIVE_EXTINCT_DELAY=5;
 const NATIVES=[
   {id:'bilby',      name:'Greater Bilby',        threshold:40},
   {id:'bettong',    name:'Burrowing Bettong',     threshold:55},
@@ -964,14 +965,23 @@ const NATIVES=[
   {id:'quoll',      name:'Western Quoll',         threshold:80},
   {id:'malleefowl', name:'Malleefowl',            threshold:92},
 ];
-// Impact from population is now much gentler: essentially zero until you pass
-// ~10,000 rabbits, then ramps to full only at a continent-scale 100M — so small
-// colonies no longer wipe natives, and it takes a genuinely huge invasion to
-// threaten the hardiest species.
+// Displacing natives is HARD. Raw pressure comes from population + territory,
+// but it only ramps to full at a continent-scale ~1B rabbits (not 100M), so it
+// takes a genuinely enormous invasion to threaten the hardier species.
+// Crucially, raw pressure is then scaled by COMPETITIVENESS — natives don't just
+// yield to numbers, they yield to rabbits that outcompete them for food and
+// burrows. A colony that never invested in Food Finding, Body Size and Litter
+// Size tops out at 40% effectiveness and simply can't push the hardy species
+// over the edge; heavy investment (>7 avg) gives a modest edge (up to 1.15x).
+function displacementCompetitiveness(){
+  const c=(GS.stats.foodFinding+GS.stats.size+GS.stats.litterSize)/3;
+  return Math.max(0.4, Math.min(1.15, c/7));
+}
 function currentNativeImpact(){
-  const popFactor=Math.max(0,Math.min(60,(Math.log10(Math.max(10,GS.pop))-4)/4*60));
+  const popFactor=Math.max(0,Math.min(60,(Math.log10(Math.max(10,GS.pop))-4)/5*60));
   const terrFactor=Math.min(40,GS.territory*0.4);
-  return Math.min(100,popFactor+terrFactor);
+  const raw=Math.min(100,popFactor+terrFactor);
+  return Math.min(100,Math.round(raw*displacementCompetitiveness()));
 }
 function updateNativeImpact(){ GS.nativeImpact=currentNativeImpact(); } // display only — no accumulation
 // Called ONCE per season (from baseGrowth) so pressure accrues per-season, not
@@ -986,6 +996,11 @@ function advanceNativePressure(){
       if(GS.nativePressure[n.id]>=NATIVE_EXTINCT_DELAY){
         GS.nativesLost.add(n.id);
         delete GS.nativePressure[n.id];
+        // Founder/bottleneck effect: an explosive monoculture takeover narrows
+        // the gene pool. Each species wiped out costs genetic diversity (the
+        // spread of every trait), which quietly weakens future adaptation.
+        STAT_DEFS.forEach(s=>{GS.statSpread[s.id]=Math.max(0.5,(GS.statSpread[s.id]||2.5)*0.85)});
+        if(typeof animateStatSidebar==='function')animateStatSidebar();
       }
     } else {
       GS.nativePressure[n.id]=Math.max(0,(GS.nativePressure[n.id]||0)-1);
@@ -1557,6 +1572,8 @@ function newGS(){
     hailMaryDone: false,
     hailMaryCommit: 0,
     hailMaryLevels: 0,
+    overCapTurns: 0, // consecutive seasons population has exceeded the carrying-capacity soft cap (20B)
+    thinTurns: 0, // consecutive seasons the colony has been spread too thin for its territory
   };
 }
 GS=newGS();
@@ -1570,6 +1587,14 @@ function fmtPop(n){
   if(n>=1e6)return(n/1e6).toFixed(1)+'M';
   if(n>=1000)return(n/1000).toFixed(0)+'K';
   return Math.round(n)+'';
+}
+// Gambling stake cap tied to population size: the larger the colony, the
+// smaller the SHARE it may risk on any one gamble. A tiny colony can bet big to
+// break out; a continental population can't stake enough to snowball to infinity.
+// Fraction decays by `stepPerDecade` for every 10x of population above 1M.
+function maxStakeFraction(pop, base, floor, stepPerDecade){
+  const decades=Math.max(0, Math.log10(Math.max(1,pop)/1e6));
+  return Math.max(floor, base - stepPerDecade*decades);
 }
 // Antagonistic trade-offs — no perfect organism. Raising one trait quietly
 // costs a linked trait (antagonistic pleiotropy). Only fires on increases.
@@ -1748,11 +1773,13 @@ function initGame(){
 //  HUD
 // ═══════════════════════════════════════════════════════
 function updateHUD(){
-  const maxPop=600000000;
-  const pct=Math.min(100,(GS.pop/maxPop)*100);
+  // Log-scaled bar so it stays meaningful from a founding colony up to the
+  // carrying-capacity soft cap (20B) = 100%. Colour flags danger at BOTH ends:
+  // near extinction, and inside the resource-collapse zone.
+  const pct=Math.max(.5,Math.min(100,(Math.log10(Math.max(10,GS.pop))-1)/(Math.log10(CAP_SOFT)-1)*100));
   const pf=document.getElementById('b-pop');
-  pf.style.width=Math.max(.5,pct)+'%';
-  pf.className='bfill pop'+(pct<5?' crit':pct<20?' warn':'');
+  pf.style.width=pct+'%';
+  pf.className='bfill pop'+(GS.pop>=CAP_SOFT?' crit':GS.pop>=CAP_SOFT*0.6?' warn':GS.pop<200?' crit':'');
   document.getElementById('v-pop').textContent=fmtPop(GS.pop);
   const tf=document.getElementById('b-terr');
   tf.style.width=GS.territory+'%';
@@ -1856,6 +1883,24 @@ function drawMap(){
 // ═══════════════════════════════════════════════════════
 //  POPULATION MECHANICS
 // ═══════════════════════════════════════════════════════
+// Carrying capacity: the continent cannot feed unlimited rabbits. Resources
+// start to strain past CAP_SOFT (20B); every season above it there is a rising
+// chance that a resource crash — mass starvation and disease — collapses the
+// population back to CAP_FLOOR (5B). The risk climbs both with how far over the
+// cap you are and with how many seasons you've stayed over (sustained overshoot).
+const CAP_SOFT=20e9, CAP_FLOOR=5e9;
+function checkCarryingCapacity(){
+  if(GS.pop<=CAP_SOFT){GS.overCapTurns=0;return;}
+  GS.overCapTurns++;
+  const billionsOver=(GS.pop-CAP_SOFT)/1e9;
+  const chance=Math.min(0.85, 0.05 + 0.05*billionsOver + 0.08*GS.overCapTurns);
+  if(Math.random()<chance){
+    const lost=GS.pop-CAP_FLOOR;
+    GS.pop=CAP_FLOOR;
+    GS.overCapTurns=0;
+    showDensityMsg(`⚠ RESOURCE COLLAPSE: the land could not sustain ${fmtPop(lost+CAP_FLOOR)} rabbits. Overgrazing, starvation and disease crash the population to ${fmtPop(CAP_FLOOR)}.`);
+  }
+}
 function baseGrowth(){
   const{foodFinding,litterSize}=GS.stats;
   let rate=0.28+(foodFinding/10)*0.14+(litterSize/10)*0.12;
@@ -1873,8 +1918,11 @@ function baseGrowth(){
     adjStatCore('predatorDefense',-0.04);
     adjStatCore('bravery',-0.04);
   }
-  // Density check
+  // Density check (thin-territory risk)
   checkDensity();
+  // Carrying-capacity collapse (resources exhausted past ~20B). Runs AFTER
+  // checkDensity so its collapse message isn't cleared by the density panel.
+  checkCarryingCapacity();
   // Native species pressure — one attrition tick per season
   advanceNativePressure();
   // Stasis
@@ -1891,42 +1939,64 @@ function getExpansionCandidates(){
     for(const adj of(ADJ[r]||[])){
       if(!GS.regions.includes(adj)&&REGION[adj]&&!REGION[adj].boat){
         const newUnits=totalDensityUnits()+rUnits(adj);
-        if(GS.pop>=newUnits*1.2)candidates.add(adj);
+        // Must be able to at least partly hold the new region — prevents grabbing
+        // huge empty territory with a handful of rabbits (which the thin-density
+        // penalty would then punish anyway). ~40% of the region's hold cost.
+        const holdCost=FULL_HOLD_POP*(REGION[adj].km2/TOTAL_KM2)*0.4;
+        if(GS.pop>=newUnits*1.2 && GS.pop>=holdCost)candidates.add(adj);
       }
     }
   }
   return[...candidates];
 }
 
+// A population spread thin over a large area is vulnerable: isolated, sparse
+// sub-populations lose ground to natives and predators, and drift/inbreeding
+// erodes fitness. Each season we compare the colony to the population it truly
+// needs to HOLD its footprint. FULL_HOLD_POP = rabbits needed to securely hold
+// 100% of the reachable continent; the requirement scales with territory held.
+// A strong breeder is safe; a land-rusher who grabbed territory without numbers
+// is not. One season's grace (a visible fading telegraph) precedes any loss.
+const FULL_HOLD_POP=12e6;
+function holdRequirement(){return FULL_HOLD_POP*(GS.territory/100);}
 function checkDensity(){
-  const minPop=minViablePop();
   const warn=document.getElementById('density-warn');
-  if(GS.pop<minPop&&GS.regions.length>1){
-    // Which regions are least viable (smallest, occupied)?
-    // Increment fading counter for all non-starting regions
-    const startReg=GS.setup.loc?.region;
-    const sortedRegions=[...GS.regions].filter(r=>r!==startReg)
-      .sort((a,b)=>rUnits(a)-rUnits(b));// smallest first = lose first
-    for(const r of sortedRegions){
-      GS.fadingRegions[r]=(GS.fadingRegions[r]||0)+1;
-      if(GS.fadingRegions[r]>=3){
-        // Lose the region
-        GS.regions=GS.regions.filter(x=>x!==r);
-        delete GS.fadingRegions[r];
-        delete GS.regionEntry[r]; // re-settling this region later starts its coverage fresh
-        GS.territory=calcTerritory();
-        showDensityMsg(`⚠ Low population density: ${REGION[r]?.name} has been abandoned.`);
-        break;
-      }
+  const startReg=GS.setup.loc?.region;
+  const req=holdRequirement();
+  const ratio=req>0?GS.pop/req:99;
+  // Only a concern once you've spread beyond a small foothold.
+  const exposed=GS.regions.length>1 && GS.territory>8;
+  const candidates=[...GS.regions].filter(r=>r!==startReg)
+    .sort((a,b)=>rUnits(b)-rUnits(a)); // largest first = hardest to defend, lost first
+  if(exposed && ratio<1 && candidates.length){
+    GS.thinTurns++;
+    // Telegraph the most exposed region on the map.
+    for(const r in GS.fadingRegions)delete GS.fadingRegions[r];
+    GS.fadingRegions[candidates[0]]=1;
+    warn.style.display='block';warn.style.color='#ff9900';
+    warn.textContent=`⚠ SPREAD TOO THIN: your colony is small for the ${GS.territory.toFixed(0)}% of Australia it holds. Isolated groups on the frontier are at risk. (${fmtPop(GS.pop)} / ~${fmtPop(req)} needed to hold it)`;
+    // One season of grace; from the 2nd consecutive thin season, roll for a loss.
+    const penaltyChance=Math.min(0.9, 0.25 + (1-ratio)*0.6);
+    if(GS.thinTurns>=2 && Math.random()<penaltyChance){
+      const r=candidates[0];
+      GS.regions=GS.regions.filter(x=>x!==r);
+      delete GS.fadingRegions[r];
+      delete GS.regionEntry[r];
+      GS.territory=calcTerritory();
+      // Genetic cost: sparse, isolated survivors lose diversity/fitness.
+      const keys=Object.keys(GS.stats);
+      const h1=keys[Math.floor(Math.random()*keys.length)];
+      let h2=keys[Math.floor(Math.random()*keys.length)];
+      if(h2===h1)h2=keys[(keys.indexOf(h1)+1)%keys.length];
+      adjStatCore(h1,-0.5);adjStatCore(h2,-0.4);
+      const s1=STAT_DEFS.find(s=>s.id===h1)?.short||h1;
+      const s2=STAT_DEFS.find(s=>s.id===h2)?.short||h2;
+      showDensityMsg(`⚠ TERRITORY LOST: too few rabbits to hold ${REGION[r]?.name} — it has been abandoned. Isolation eroded the gene pool (${s1} −0.5, ${s2} −0.4).`);
+      GS.thinTurns=0;
     }
-    warn.style.display='block';
-    warn.textContent=`⚠ DENSITY WARNING: Population too low for current territory. Need ${minPop} rabbits to hold all regions. (${GS.pop} / ${minPop})`;
   } else {
-    // Clear fading for regions now viable
-    for(const r in GS.fadingRegions){
-      if(!GS.regions.includes(r))delete GS.fadingRegions[r];
-      else if(GS.pop>=minViablePop())delete GS.fadingRegions[r];
-    }
+    GS.thinTurns=0;
+    for(const r in GS.fadingRegions)delete GS.fadingRegions[r];
     warn.style.display='none';
   }
 }
@@ -2139,6 +2209,13 @@ function applyChoice(idx,doLog){
   if(fx.popMult!=null)GS.pop=Math.max(5,Math.round(GS.pop*fx.popMult));
   if(fx.statDeltas)Object.entries(fx.statDeltas).forEach(([k,v])=>adjStat(k,v));
   if(fx.terrBonus)GS.territory=parseFloat(Math.min(100,GS.territory+fx.terrBonus).toFixed(2));
+  // Overwhelm cost: an aggressive land-grab (big population surge that also
+  // claims territory) spreads a monoculture fast, narrowing the gene pool.
+  // Choosing to overwhelm rather than consolidate quietly costs genetic diversity.
+  if((fx.popMult>1.4||fx.diversityCost) && (fx.terrBonus||fx.diversityCost)){
+    const f=fx.diversityCost||0.95;
+    STAT_DEFS.forEach(s=>{GS.statSpread[s.id]=Math.max(0.5,(GS.statSpread[s.id]||2.5)*f)});
+  }
   if(fx.unlockRegion&&!GS.regions.includes(fx.unlockRegion)){
     GS.regions.push(fx.unlockRegion);
     GS.regionEntry[fx.unlockRegion]={turn:GS.turn,pop:GS.pop};
@@ -2212,13 +2289,23 @@ function runnerLoop(ts){
   if(RR.y===0){RR.vy=0;RR.jumpHeld=false;}
   // Speed ramp
   RR.speed=6+Math.min(18,elapsed/4000);
-  // Spawn
+  // Spawn — the rhythm is deliberately unpredictable. A proven-safe minimum gap
+  // acts as a FLOOR (adding space can never make an obstacle unjumpable), then a
+  // heavily randomized extra is layered on so spacing varies from tight pairs to
+  // long empty stretches. Height varies widely too — from low nubs to tall
+  // barriers — biased toward shorter, so no two obstacles feel the same.
   RR.spawnT--;
   if(RR.spawnT<=0){
-    const h=18+Math.random()*22;
-    RR.obs.push({x:RC_W,w:10,h});
-    const gap=Math.max(12,65-elapsed/800);
-    RR.spawnT=Math.floor(gap+Math.random()*20);
+    const h=12+Math.random()*Math.random()*29;            // ~12–41, biased low
+    const w=9+Math.floor(Math.random()*Math.random()*8);  // ~9–16, occasional wider
+    RR.obs.push({x:RC_W,w,h});
+    const baseGap=Math.max(14,60-elapsed/900);             // safe floor (shrinks over time)
+    const roll=Math.random();
+    let extra;
+    if(roll<0.18)      extra=Math.random()*10;             // tight
+    else if(roll<0.72) extra=10+Math.random()*40;          // normal, varied
+    else               extra=55+Math.random()*75;          // long empty stretch
+    RR.spawnT=Math.floor(baseGap+extra);
   }
   // Move obs
   RR.obs=RR.obs.filter(o=>{o.x-=RR.speed;return o.x>-20});
@@ -2484,10 +2571,13 @@ function hmOutcomeForLevels(lv){return HM_OUTCOMES.find(o=>lv>=o.lv)||HM_OUTCOME
 function openHailMarySetup(){
   sndDramatic();
   const pop=GS.pop;
-  const maxC=Math.max(1,Math.floor(pop*0.7));
+  const frac=maxStakeFraction(pop, 0.7, 0.08, 0.11);
+  const maxC=Math.max(1,Math.floor(pop*frac));
   const initC=Math.max(1,Math.floor(maxC*0.4));
   GS.hailMaryCommit=initC;
   document.getElementById('hm-pop').textContent=fmtPop(pop);
+  const capLbl=document.getElementById('hm-cap-lbl');
+  if(capLbl)capLbl.textContent=`RABBITS TO COMMIT (MAX ${Math.round(frac*100)}%)`;
   const sl=document.getElementById('hm-slider');
   sl.max=maxC; sl.value=initC;
   document.getElementById('hm-amt').textContent=fmtPop(initC);
@@ -3174,10 +3264,13 @@ function frInRiver(r){return r>=FR_ROW_RIV_S&&r<=FR_ROW_RIV_E;}
 
 function openGambleSetup(){
   const pop=GS.pop;
-  const maxG=Math.max(1,Math.floor(pop*0.5));
+  const frac=maxStakeFraction(pop, 0.5, 0.05, 0.09);
+  const maxG=Math.max(1,Math.floor(pop*frac));
   const initG=Math.max(1,Math.floor(maxG*0.2));
   GS.froggerGamble=initG;
   document.getElementById('go-pop').textContent=fmtPop(pop);
+  const capLbl=document.getElementById('go-cap-lbl');
+  if(capLbl)capLbl.textContent=`RABBITS TO GAMBLE (MAX ${Math.round(frac*100)}%)`;
   const sl=document.getElementById('go-slider');
   sl.max=maxG; sl.value=initG;
   buildGambleTable(initG);
